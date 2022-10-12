@@ -6,7 +6,7 @@ require (
 	github.com/projectdiscovery/fileutil v0.0.1
 	github.com/projectdiscovery/goflags v0.1.0
 	github.com/projectdiscovery/gologger v1.1.4
-	github.com/projectdiscovery/mapcidr v1.0.2
+	github.com/projectdiscovery/mapcidr v1.0.3
 	github.com/projectdiscovery/retryabledns v1.0.15
 	github.com/stretchr/testify v1.8.0
 )
