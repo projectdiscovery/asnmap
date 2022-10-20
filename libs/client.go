@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -76,70 +77,76 @@ func NewClient() *Client {
 }
 
 // SetProxy adds a proxy to the client
-func (c *Client) SetProxy(proxyList []string) {
-list:
+func (c *Client) SetProxy(proxyList []string) error {
 	for _, p := range proxyList {
-		proxyurl, err := url.Parse(p)
-		if err == nil {
-			if err := c.setProxy(proxyurl); err == nil {
-				gologger.Info().Msgf("Using %s proxy %s", proxyurl.Scheme, p)
-				break
-			} else {
-				gologger.Error().Msgf("Error setting proxy %s: %s", p, err)
-			}
+		if proxyurl, err := c.setProxy(p); err == nil {
+			gologger.Info().Msgf("Using %s proxy %s", proxyurl.Scheme, proxyurl.String())
+			return nil
 		} else {
 			if fileutil.FileExists(p) {
-				file, err := os.Open(p)
-				if err != nil {
-					continue
-				}
-				defer file.Close()
-				scanner := bufio.NewScanner(file)
-				for scanner.Scan() {
-					proxy := scanner.Text()
-					if strings.TrimSpace(proxy) == "" {
-						continue
-					}
-					proxyurl, err := url.Parse(proxy)
-					if err != nil {
-						continue
-					}
-					if err := c.setProxy(proxyurl); err == nil {
-						gologger.Info().Msgf("Using %s proxy %s", proxyurl.Scheme, p)
-						break list
-					} else {
-						gologger.Error().Msgf("Error setting proxy %s: %s", p, err)
-					}
+				if proxyurl, err := c.setProxyFromFile(p); err == nil {
+					gologger.Info().Msgf("Using %s proxy %s", proxyurl.Scheme, proxyurl.String())
+					return nil
 				}
 			}
 		}
-
 	}
+	return errors.New("no valid proxy found")
 }
 
-func (c *Client) setProxy(proxyurl *url.URL) error {
-	_, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%s", proxyurl.Hostname(), proxyurl.Port()), time.Second*5)
+// setProxyFromFile reads the file contents and tries to set the proxy
+func (c *Client) setProxyFromFile(fileName string) (*url.URL, error) {
+	file, err := os.Open(fileName)
 	if err != nil {
-		return err
+		return nil, err
 	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		proxy := strings.TrimSpace(scanner.Text())
+		if proxy == "" {
+			continue
+		}
+		if proxyurl, err := c.setProxy(proxy); err == nil {
+			gologger.Info().Msgf("Using proxy %s", proxy)
+			return proxyurl, nil
+		}
+	}
+	return nil, fmt.Errorf("no valid proxy found")
+}
+
+// setProxy sets a proxy to the client
+func (c *Client) setProxy(proxyString string) (*url.URL, error) {
+	// parse the proxy url string
+	proxyurl, err := url.Parse(proxyString)
+	if err != nil {
+		return nil, err
+	}
+
+	// try to connect to the proxy
+	_, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%s", proxyurl.Hostname(), proxyurl.Port()), time.Second*5)
+	if err != nil {
+		return nil, err
+	}
+
 	if proxyurl.Scheme == "http" || proxyurl.Scheme == "https" {
 		c.http.Transport = &http.Transport{
 			Proxy:           http.ProxyURL(proxyurl),
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
-		return nil
+		return proxyurl, nil
 	}
 	if proxyurl.Scheme == "socks5" {
 		dialer, err := proxy.SOCKS5("tcp", proxyurl.Host, nil, proxy.Direct)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		c.http.Transport = &http.Transport{
 			Dial: dialer.Dial,
 		}
-		return nil
+		return proxyurl, nil
 	}
-	return fmt.Errorf("invalid proxy scheme: %s", proxyurl.Scheme)
+	return nil, fmt.Errorf("invalid proxy scheme: %s", proxyurl.Scheme)
 }
 
 func generateRawQuery(query, value string) string {
