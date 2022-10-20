@@ -1,14 +1,21 @@
 package asnmap
 
 import (
+	"bufio"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	url "net/url"
 	"os"
+	"strings"
+	"time"
 
+	"github.com/projectdiscovery/fileutil"
 	"github.com/projectdiscovery/gologger"
+	"golang.org/x/net/proxy"
 
 	"reflect"
 	"sync"
@@ -66,6 +73,73 @@ func NewClient() *Client {
 		sync: &Syncer{},
 	}
 	return &client
+}
+
+// SetProxy adds a proxy to the client
+func (c *Client) SetProxy(proxyList []string) {
+list:
+	for _, p := range proxyList {
+		proxyurl, err := url.Parse(p)
+		if err == nil {
+			if err := c.setProxy(proxyurl); err == nil {
+				gologger.Info().Msgf("Using %s proxy %s", proxyurl.Scheme, p)
+				break
+			} else {
+				gologger.Error().Msgf("Error setting proxy %s: %s", p, err)
+			}
+		} else {
+			if fileutil.FileExists(p) {
+				file, err := os.Open(p)
+				if err != nil {
+					continue
+				}
+				defer file.Close()
+				scanner := bufio.NewScanner(file)
+				for scanner.Scan() {
+					proxy := scanner.Text()
+					if strings.TrimSpace(proxy) == "" {
+						continue
+					}
+					proxyurl, err := url.Parse(proxy)
+					if err != nil {
+						continue
+					}
+					if err := c.setProxy(proxyurl); err == nil {
+						gologger.Info().Msgf("Using %s proxy %s", proxyurl.Scheme, p)
+						break list
+					} else {
+						gologger.Error().Msgf("Error setting proxy %s: %s", p, err)
+					}
+				}
+			}
+		}
+
+	}
+}
+
+func (c *Client) setProxy(proxyurl *url.URL) error {
+	_, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%s", proxyurl.Hostname(), proxyurl.Port()), time.Second*5)
+	if err != nil {
+		return err
+	}
+	if proxyurl.Scheme == "http" || proxyurl.Scheme == "https" {
+		c.http.Transport = &http.Transport{
+			Proxy:           http.ProxyURL(proxyurl),
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		return nil
+	}
+	if proxyurl.Scheme == "socks5" {
+		dialer, err := proxy.SOCKS5("tcp", proxyurl.Host, nil, proxy.Direct)
+		if err != nil {
+			return err
+		}
+		c.http.Transport = &http.Transport{
+			Dial: dialer.Dial,
+		}
+		return nil
+	}
+	return fmt.Errorf("invalid proxy scheme: %s", proxyurl.Scheme)
 }
 
 func generateRawQuery(query, value string) string {

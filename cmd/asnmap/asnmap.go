@@ -102,7 +102,9 @@ func main() {
 	options = parseOptions()
 
 	client := asnmap.NewClient()
-
+	if len(options.Proxy) > 0 {
+		client.SetProxy(options.Proxy)
+	}
 	if options.OutputFile != "" {
 		if _, err := os.Stat(options.OutputFile); err == nil {
 			err := os.Remove(options.OutputFile)
