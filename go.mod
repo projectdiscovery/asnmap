@@ -7,7 +7,7 @@ require (
 	github.com/projectdiscovery/goflags v0.1.1
 	github.com/projectdiscovery/gologger v1.1.4
 	github.com/projectdiscovery/mapcidr v1.0.3
-	github.com/projectdiscovery/retryabledns v1.0.15
+	github.com/projectdiscovery/retryabledns v1.0.16
 	github.com/stretchr/testify v1.8.0
 )
 
