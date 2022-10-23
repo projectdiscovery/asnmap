@@ -1,9 +1,10 @@
 package main
 
 import (
-	asnmap "github.com/projectdiscovery/asnmap/libs"
 	"sync"
 	"testing"
+
+	asnmap "github.com/projectdiscovery/asnmap/libs"
 
 	"github.com/stretchr/testify/require"
 )
@@ -24,7 +25,7 @@ func TestProcess(t *testing.T) {
 				Ip: []string{"104.16.99.52"},
 			},
 			expectedOutput: []asnmap.Response{
-				asnmap.Response{
+				{
 					FirstIp: "104.16.0.0",
 					LastIp:  "104.21.127.255",
 					Input:   "104.16.99.52",
@@ -41,7 +42,7 @@ func TestProcess(t *testing.T) {
 				Asn: []string{"AS14421"},
 			},
 			expectedOutput: []asnmap.Response{
-				asnmap.Response{
+				{
 					FirstIp: "216.101.17.0",
 					LastIp:  "216.101.17.255",
 					Input:   "14421",
@@ -58,14 +59,14 @@ func TestProcess(t *testing.T) {
 				Org: []string{"PPLINK"},
 			},
 			expectedOutput: []asnmap.Response{
-				asnmap.Response{
+				{
 					FirstIp: "45.239.52.0",
 					LastIp:  "45.239.55.255",
 					Input:   "PPLINK",
 					ASN:     268353,
 					Country: "BR",
 					Org:     "PPLINKNET SERVICOS DE COMUNICACAO LTDA - ME"},
-				asnmap.Response{
+				{
 					FirstIp: "2804:4fd8::",
 					LastIp:  "2804:4fd8:ffff:ffff:ffff:ffff:ffff:ffff",
 					Input:   "PPLINK",

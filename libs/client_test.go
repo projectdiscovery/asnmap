@@ -42,7 +42,7 @@ func TestGetIPFromASN(t *testing.T) {
 	}{
 		{"zero match", "1123", "1123", []Response{}},
 		{"single match", "14421", "14421", []Response{
-			Response{
+			{
 				FirstIp: "216.101.17.0",
 				LastIp:  "216.101.17.255",
 				Input:   "14421",
@@ -52,21 +52,21 @@ func TestGetIPFromASN(t *testing.T) {
 		},
 		},
 		{"multi match", "7712", "7712", []Response{
-			Response{
+			{
 				FirstIp: "118.67.200.0",
 				LastIp:  "118.67.202.255",
 				Input:   "7712",
 				ASN:     7712,
 				Country: "KH",
 				Org:     "SABAY Sabay Digital Cambodia"},
-			Response{
+			{
 				FirstIp: "118.67.203.0",
 				LastIp:  "118.67.207.255",
 				Input:   "7712",
 				ASN:     7712,
 				Country: "KH",
 				Org:     "SABAY Sabay Digital Cambodia"},
-			Response{
+			{
 				FirstIp: "2405:aa00::",
 				LastIp:  "2405:aa00:ffff:ffff:ffff:ffff:ffff:ffff",
 				Input:   "7712",
@@ -100,14 +100,14 @@ func TestGetASNFromOrg(t *testing.T) {
 	}{
 		{"not found", "RANDOM_TEXT", "RANDON_TEXT", []Response{}},
 		{"regex match", "PPLINKNET*", "PPLINKNET", []Response{
-			Response{
+			{
 				FirstIp: "45.239.52.0",
 				LastIp:  "45.239.55.255",
 				Input:   "PPLINKNET",
 				ASN:     268353,
 				Country: "BR",
 				Org:     "PPLINKNET SERVICOS DE COMUNICACAO LTDA - ME"},
-			Response{
+			{
 				FirstIp: "2804:4fd8::",
 				LastIp:  "2804:4fd8:ffff:ffff:ffff:ffff:ffff:ffff",
 				Input:   "PPLINKNET",

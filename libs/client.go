@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	url "net/url"
@@ -78,17 +78,20 @@ func NewClient() *Client {
 
 // SetProxy adds a proxy to the client
 func (c *Client) SetProxy(proxyList []string) error {
+	var (
+		proxyUrl *url.URL
+		err      error
+	)
 	for _, p := range proxyList {
-		if proxyurl, err := c.setProxy(p); err == nil {
-			gologger.Info().Msgf("Using %s proxy %s", proxyurl.Scheme, proxyurl.String())
+		switch {
+		case fileutil.FileExists(p):
+			proxyUrl, err = c.setProxyFromFile(p)
+		default:
+			proxyUrl, err = c.setProxy(p)
+		}
+		if err == nil && proxyUrl != nil {
+			gologger.Info().Msgf("Using %s proxy %s", proxyUrl.Scheme, proxyUrl.String())
 			return nil
-		} else {
-			if fileutil.FileExists(p) {
-				if proxyurl, err := c.setProxyFromFile(p); err == nil {
-					gologger.Info().Msgf("Using %s proxy %s", proxyurl.Scheme, proxyurl.String())
-					return nil
-				}
-			}
 		}
 	}
 	return errors.New("no valid proxy found")
@@ -107,12 +110,12 @@ func (c *Client) setProxyFromFile(fileName string) (*url.URL, error) {
 		if proxy == "" {
 			continue
 		}
-		if proxyurl, err := c.setProxy(proxy); err == nil {
-			gologger.Info().Msgf("Using proxy %s", proxy)
-			return proxyurl, nil
+		proxyUrl, err := c.setProxy(proxy)
+		if err == nil && proxyUrl != nil {
+			return proxyUrl, nil
 		}
 	}
-	return nil, fmt.Errorf("no valid proxy found")
+	return nil, fmt.Errorf("no valid proxy found in file '%s'", fileName)
 }
 
 // setProxy sets a proxy to the client
@@ -129,14 +132,14 @@ func (c *Client) setProxy(proxyString string) (*url.URL, error) {
 		return nil, err
 	}
 
-	if proxyurl.Scheme == "http" || proxyurl.Scheme == "https" {
+	switch proxyurl.Scheme {
+	case "http", "https":
 		c.http.Transport = &http.Transport{
 			Proxy:           http.ProxyURL(proxyurl),
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 		return proxyurl, nil
-	}
-	if proxyurl.Scheme == "socks5" {
+	case "socks5":
 		dialer, err := proxy.SOCKS5("tcp", proxyurl.Host, nil, proxy.Direct)
 		if err != nil {
 			return nil, err
@@ -145,8 +148,9 @@ func (c *Client) setProxy(proxyString string) (*url.URL, error) {
 			Dial: dialer.Dial,
 		}
 		return proxyurl, nil
+	default:
+		return nil, fmt.Errorf("invalid proxy scheme: %s", proxyurl.Scheme)
 	}
-	return nil, fmt.Errorf("invalid proxy scheme: %s", proxyurl.Scheme)
 }
 
 func generateRawQuery(query, value string) string {
@@ -165,14 +169,14 @@ func insertInputInResponse(input string, resp []Response) []Response {
 }
 
 func (c Client) makeRequest() ([]byte, error) {
-	req, _ := http.NewRequest("GET", c.url.String(), nil)
+	req, _ := http.NewRequest(http.MethodGet, c.url.String(), nil)
 	res, err := c.http.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
-	resBody, _ := ioutil.ReadAll(res.Body)
+	resBody, _ := io.ReadAll(res.Body)
 	return resBody, nil
 }
 
