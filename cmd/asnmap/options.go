@@ -23,6 +23,7 @@ type Options struct {
 	Domain        goflags.StringSlice
 	Ip            goflags.StringSlice
 	Org           goflags.StringSlice
+	Proxy         goflags.StringSlice
 	OutputFile    string
 	Output        io.Writer
 	DisplayInJSON bool
@@ -94,6 +95,7 @@ func parseOptions() *Options {
 	flagSet.CreateGroup("configs", "Configurations",
 		flagSet.StringVar(&cfgFile, "config", "", "path to the asnmap configuration file"),
 		flagSet.StringSliceVarP(&options.Resolvers, "resolvers", "r", nil, "list of resolvers to use", goflags.FileCommaSeparatedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Proxy, "proxy", "p", nil, " list of proxy to use (comma separated or file input)", goflags.FileCommaSeparatedStringSliceOptions),
 	)
 
 	// Output

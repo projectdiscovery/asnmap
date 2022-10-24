@@ -102,7 +102,11 @@ func main() {
 	options = parseOptions()
 
 	client := asnmap.NewClient()
-
+	if len(options.Proxy) > 0 {
+		if err := client.SetProxy(options.Proxy); err != nil {
+			gologger.Fatal().Msgf("Could not set proxy: %s", err)
+		}
+	}
 	if options.OutputFile != "" {
 		if _, err := os.Stat(options.OutputFile); err == nil {
 			err := os.Remove(options.OutputFile)

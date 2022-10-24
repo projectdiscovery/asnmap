@@ -17,7 +17,7 @@ func TestGetFormattedDataInJson(t *testing.T) {
 		{
 			name: "ASN",
 			inputResponse: []Response{
-				Response{
+				{
 					FirstIp: "216.101.17.0",
 					LastIp:  "216.101.17.255",
 					Input:   "AS14421",
@@ -60,7 +60,7 @@ func TestGetFormattedDataInCSV(t *testing.T) {
 		{
 			name: "ASN",
 			inputResponse: []Response{
-				Response{
+				{
 					FirstIp: "216.101.17.0",
 					LastIp:  "216.101.17.255",
 					Input:   "14421",
@@ -75,7 +75,7 @@ func TestGetFormattedDataInCSV(t *testing.T) {
 		{
 			name: "Org",
 			inputResponse: []Response{
-				Response{
+				{
 					FirstIp: "45.239.52.0",
 					LastIp:  "45.239.55.255",
 					Input:   "pplinknet",
@@ -83,7 +83,7 @@ func TestGetFormattedDataInCSV(t *testing.T) {
 					Country: "BR",
 					Org:     "PPLINKNET SERVICOS DE COMUNICACAO LTDA - ME",
 				},
-				Response{
+				{
 					FirstIp: "2804:4fd8::",
 					LastIp:  "2804:4fd8:ffff:ffff:ffff:ffff:ffff:ffff",
 					Input:   "pplinknet",
@@ -100,7 +100,7 @@ func TestGetFormattedDataInCSV(t *testing.T) {
 		{
 			name: "IP",
 			inputResponse: []Response{
-				Response{
+				{
 					FirstIp: "104.16.0.0",
 					LastIp:  "104.21.127.255",
 					Input:   "104.16.99.52",
