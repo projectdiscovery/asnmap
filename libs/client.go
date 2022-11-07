@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/projectdiscovery/fileutil"
 	"github.com/projectdiscovery/gologger"
+	fileutil "github.com/projectdiscovery/utils/file"
 	"golang.org/x/net/proxy"
 
 	"reflect"

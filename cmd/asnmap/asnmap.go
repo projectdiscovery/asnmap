@@ -9,8 +9,8 @@ import (
 
 	asnmap "github.com/projectdiscovery/asnmap/libs"
 
-	"github.com/projectdiscovery/fileutil"
 	"github.com/projectdiscovery/gologger"
+	fileutil "github.com/projectdiscovery/utils/file"
 )
 
 var options *Options
