@@ -31,7 +31,7 @@ require (
 	github.com/projectdiscovery/retryablehttp-go v1.0.2 // indirect
 	github.com/projectdiscovery/sliceutil v0.0.1 // indirect
 	github.com/projectdiscovery/stringsutil v0.0.2 // indirect
-	github.com/projectdiscovery/utils v0.0.2
+	github.com/projectdiscovery/utils v0.0.3
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
