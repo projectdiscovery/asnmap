@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/projectdiscovery/fileutil v0.0.3 // indirect
-	github.com/projectdiscovery/goflags v0.1.3
+	github.com/projectdiscovery/goflags v0.1.5
 	github.com/projectdiscovery/gologger v1.1.4
 	github.com/projectdiscovery/mapcidr v1.0.3
 	github.com/projectdiscovery/retryabledns v1.0.17
