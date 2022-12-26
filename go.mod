@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/projectdiscovery/fileutil v0.0.3 // indirect
-	github.com/projectdiscovery/goflags v0.1.5
+	github.com/projectdiscovery/goflags v0.1.6
 	github.com/projectdiscovery/gologger v1.1.5
 	github.com/projectdiscovery/mapcidr v1.0.3
 	github.com/projectdiscovery/retryabledns v1.0.17
@@ -31,7 +31,7 @@ require (
 	github.com/projectdiscovery/retryablehttp-go v1.0.2 // indirect
 	github.com/projectdiscovery/sliceutil v0.0.1 // indirect
 	github.com/projectdiscovery/stringsutil v0.0.2 // indirect
-	github.com/projectdiscovery/utils v0.0.3
+	github.com/projectdiscovery/utils v0.0.4-0.20221214110533-9f95ee986a54
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
@@ -48,7 +48,9 @@ require (
 	github.com/mholt/archiver v3.1.1+incompatible // indirect
 	github.com/nwaples/rardecode v1.1.0 // indirect
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
+	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/ulikunitz/xz v0.5.7 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
+	golang.org/x/exp v0.0.0-20221019170559-20944726eadf // indirect
 	gopkg.in/djherbis/times.v1 v1.3.0 // indirect
 )
