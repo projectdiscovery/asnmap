@@ -3,11 +3,10 @@ module github.com/projectdiscovery/asnmap
 go 1.18
 
 require (
-	github.com/projectdiscovery/fileutil v0.0.3 // indirect
 	github.com/projectdiscovery/goflags v0.1.6
 	github.com/projectdiscovery/gologger v1.1.5
 	github.com/projectdiscovery/mapcidr v1.0.3
-	github.com/projectdiscovery/retryabledns v1.0.17
+	github.com/projectdiscovery/retryabledns v1.0.18
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/net v0.4.0
 )
@@ -27,8 +26,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/projectdiscovery/blackrock v0.0.0-20220628111055-35616c71b2dc // indirect
-	github.com/projectdiscovery/iputil v0.0.2 // indirect
-	github.com/projectdiscovery/retryablehttp-go v1.0.2 // indirect
+	github.com/projectdiscovery/retryablehttp-go v1.0.7 // indirect
 	github.com/projectdiscovery/sliceutil v0.0.1 // indirect
 	github.com/projectdiscovery/stringsutil v0.0.2 // indirect
 	github.com/projectdiscovery/utils v0.0.4-0.20221214110533-9f95ee986a54
@@ -43,6 +41,7 @@ require (
 )
 
 require (
+	github.com/Mzack9999/go-http-digest-auth-client v0.6.1-0.20220414142836-eb8883508809 // indirect
 	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/mholt/archiver v3.1.1+incompatible // indirect
