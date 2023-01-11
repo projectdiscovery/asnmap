@@ -25,7 +25,10 @@ func process(wg *sync.WaitGroup, inputchan chan interface{}, outputchan chan []a
 		}
 
 		if _, ok := value.(asnmap.Domain); ok {
-			resolvedIps := asnmap.ResolveDomain(reflect.ValueOf(value).String(), options.Resolvers...)
+			resolvedIps, err := asnmap.ResolveDomain(reflect.ValueOf(value).String(), options.Resolvers...)
+			if err != nil {
+				gologger.Fatal().Msgf("%s\n", err)
+			}
 			if len(resolvedIps) == 0 {
 				gologger.Verbose().Msgf("No records found for %v", reflect.ValueOf(value).String())
 			} else {
@@ -33,7 +36,10 @@ func process(wg *sync.WaitGroup, inputchan chan interface{}, outputchan chan []a
 					wg.Add(1)
 					go func(v string, input interface{}) {
 						defer wg.Done()
-						ls := client.GetData(asnmap.IP(v), input)
+						ls, err := client.GetData(asnmap.IP(v), input)
+						if err != nil {
+							gologger.Fatal().Msgf("%s\n", err)
+						}
 						if len(ls) > 0 {
 							outputchan <- ls
 						}
@@ -44,7 +50,10 @@ func process(wg *sync.WaitGroup, inputchan chan interface{}, outputchan chan []a
 			wg.Add(1)
 			go func(value interface{}) {
 				defer wg.Done()
-				ls := client.GetData(value, value)
+				ls, err := client.GetData(value, value)
+				if err != nil {
+					gologger.Fatal().Msgf("%s\n", err)
+				}
 				if len(ls) > 0 {
 					outputchan <- ls
 				} else {
@@ -101,10 +110,15 @@ func prepareInput(wg *sync.WaitGroup, inputchan chan interface{}) {
 func main() {
 	options = parseOptions()
 
-	client := asnmap.NewClient()
+	client, err := asnmap.NewClient()
+	if err != nil {
+		gologger.Fatal().Msgf("%s\n", err)
+	}
 	if len(options.Proxy) > 0 {
-		if err := client.SetProxy(options.Proxy); err != nil {
+		if proxyURL, err := client.SetProxy(options.Proxy); err != nil {
 			gologger.Fatal().Msgf("Could not set proxy: %s", err)
+		} else {
+			gologger.Info().Msgf("Using %s proxy %s", proxyURL.Scheme, proxyURL.String())
 		}
 	}
 	if options.OutputFile != "" {
