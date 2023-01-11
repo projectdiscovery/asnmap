@@ -58,8 +58,8 @@ github.com/projectdiscovery/blackrock v0.0.0-20220628111055-35616c71b2dc h1:jqZK
 github.com/projectdiscovery/blackrock v0.0.0-20220628111055-35616c71b2dc/go.mod h1:5tNGQP9kOfW+X5+40pZP8aqPYLHs45nJkFaSHLxdeH8=
 github.com/projectdiscovery/goflags v0.1.6 h1:EXigzX4lJmn/fLMnULdc03O7WW+DjiYZhNgdGvfg+Z4=
 github.com/projectdiscovery/goflags v0.1.6/go.mod h1:yILgA7gbrHuTpIvMfikbivzoxkyxBD1Y5/PRHiGTIFk=
-github.com/projectdiscovery/gologger v1.1.5 h1:CT2Jrpzusca+dwNREMMz4RnAreJ0RqaISRU4SBcZC+M=
-github.com/projectdiscovery/gologger v1.1.5/go.mod h1:bNyVaC1U/NpJtFkJltcesn01NR3K8Hg6RsLVce6yvrw=
+github.com/projectdiscovery/gologger v1.1.7 h1:QeByO4NR8vlZ5ZM2XIOJARRj5WOOU5Ix35FBQ1iH5Rk=
+github.com/projectdiscovery/gologger v1.1.7/go.mod h1:bNyVaC1U/NpJtFkJltcesn01NR3K8Hg6RsLVce6yvrw=
 github.com/projectdiscovery/mapcidr v1.0.3 h1:SGtOOEz0AxthVO7ZonMvhrJ/AQkHIXCVgyZqJdY0cAY=
 github.com/projectdiscovery/mapcidr v1.0.3/go.mod h1:/0lEXlu/q0t5u34vIVF6odHR+JCdD3CIHNsMXo7nwrU=
 github.com/projectdiscovery/retryabledns v1.0.19 h1:FJZtfchquXJNMkTgDyVtIRiw0PtD0obSUfE7f9GtpR8=
