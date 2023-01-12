@@ -43,6 +43,13 @@ func (r *Runner) filterIPv6(ips []*net.IPNet) []*net.IPNet {
 
 // writeOutput either to file or to stdout
 func (r *Runner) writeOutput(output []*asnmap.Response) error {
+	if r.options.OnResult != nil {
+		r.options.OnResult(output)
+	}
+	// empty output is ignored
+	if r.options.Output == nil {
+		return nil
+	}
 	switch {
 	case r.options.DisplayInJSON:
 		result, err := asnmap.GetFormattedDataInJson(output)

@@ -11,15 +11,11 @@ import (
 func TestRunner(t *testing.T) {
 	tests := []struct {
 		name           string
-		inputchan      chan interface{}
-		outputchan     chan []*asnmap.Response
 		options        *Options
 		expectedOutput []*asnmap.Response
 	}{
 		{
-			name:       "IP",
-			inputchan:  make(chan interface{}),
-			outputchan: make(chan []*asnmap.Response),
+			name: "IP",
 			options: &Options{
 				Ip: []string{"104.16.99.52"},
 			},
@@ -34,9 +30,7 @@ func TestRunner(t *testing.T) {
 			},
 		},
 		{
-			name:       "ASN",
-			inputchan:  make(chan interface{}),
-			outputchan: make(chan []*asnmap.Response),
+			name: "ASN",
 			options: &Options{
 				Asn: []string{"AS14421"},
 			},
@@ -51,9 +45,7 @@ func TestRunner(t *testing.T) {
 			},
 		},
 		{
-			name:       "Org",
-			inputchan:  make(chan interface{}),
-			outputchan: make(chan []*asnmap.Response),
+			name: "Org",
 			options: &Options{
 				Org: []string{"PPLINK"},
 			},
@@ -77,7 +69,6 @@ func TestRunner(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			tt.options.OnResult = func(o []*asnmap.Response) {
 				require.Equal(t, o, tt.expectedOutput)
 			}
@@ -127,7 +118,7 @@ func TestProcessForDomainInput(t *testing.T) {
 			tt.options.OnResult = func(o []*asnmap.Response) {
 				x := compareResponse(o, tt.expectedOutput)
 				// // Expecting true from comparision
-				require.Equal(t, true, x)
+				require.True(t, x)
 			}
 
 			r, err := New(tt.options)

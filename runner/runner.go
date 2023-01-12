@@ -20,7 +20,11 @@ type Runner struct {
 }
 
 func New(options *Options) (*Runner, error) {
-	return &Runner{options: options}, nil
+	client, err := asnmap.NewClient()
+	if err != nil {
+		return nil, err
+	}
+	return &Runner{options: options, client: client}, nil
 }
 
 func (r *Runner) Close() error {
@@ -35,11 +39,6 @@ func (r *Runner) Close() error {
 }
 
 func (r *Runner) Run() error {
-	var err error
-	r.client, err = asnmap.NewClient()
-	if err != nil {
-		return err
-	}
 	if len(r.options.Proxy) > 0 {
 		if proxyURL, err := r.client.SetProxy(r.options.Proxy); err != nil {
 			return fmt.Errorf("Could not set proxy: %s", err)
@@ -128,7 +127,7 @@ func (r *Runner) process() error {
 func (r *Runner) setItem(v string) {
 	item := strings.TrimSpace(v)
 	if item != "" {
-		r.hm.Set(item, nil)
+		_ = r.hm.Set(item, nil)
 	}
 }
 

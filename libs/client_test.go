@@ -26,7 +26,7 @@ func TestGetASNFromIP(t *testing.T) {
 			// // Expecting true from comparision
 			for _, result := range tc.result {
 				x := compareResponse(i, result)
-				require.Equal(t, true, x)
+				require.True(t, x)
 			}
 		})
 	}
@@ -41,40 +41,45 @@ func TestGetIPFromASN(t *testing.T) {
 		asn    string
 		result []*Response
 	}{
-		{"zero match", "1123", []*Response{}},
-		{"single match", "14421", []*Response{
-			{
+		{
+			"zero match", "1123", []*Response{},
+		},
+		{
+			"single match", "14421", []*Response{{
 				FirstIp: "216.101.17.0",
 				LastIp:  "216.101.17.255",
 				Input:   "14421",
 				ASN:     14421,
 				Country: "US",
-				Org:     "THERAVANCE"},
+				Org:     "THERAVANCE",
+			}},
 		},
-		},
-		{"multi match", "7712", []*Response{
-			{
-				FirstIp: "118.67.200.0",
-				LastIp:  "118.67.202.255",
-				Input:   "7712",
-				ASN:     7712,
-				Country: "KH",
-				Org:     "SABAY Sabay Digital Cambodia"},
-			{
-				FirstIp: "118.67.203.0",
-				LastIp:  "118.67.207.255",
-				Input:   "7712",
-				ASN:     7712,
-				Country: "KH",
-				Org:     "SABAY Sabay Digital Cambodia"},
-			{
-				FirstIp: "2405:aa00::",
-				LastIp:  "2405:aa00:ffff:ffff:ffff:ffff:ffff:ffff",
-				Input:   "7712",
-				ASN:     7712,
-				Country: "KH",
-				Org:     "SABAY Sabay Digital Cambodia"},
-		},
+		{
+			"multi match", "7712", []*Response{
+				{
+					FirstIp: "118.67.200.0",
+					LastIp:  "118.67.202.255",
+					Input:   "7712",
+					ASN:     7712,
+					Country: "KH",
+					Org:     "SABAY Sabay Digital Cambodia",
+				},
+				{
+					FirstIp: "118.67.203.0",
+					LastIp:  "118.67.207.255",
+					Input:   "7712",
+					ASN:     7712,
+					Country: "KH",
+					Org:     "SABAY Sabay Digital Cambodia",
+				},
+				{
+					FirstIp: "2405:aa00::",
+					LastIp:  "2405:aa00:ffff:ffff:ffff:ffff:ffff:ffff",
+					Input:   "7712",
+					ASN:     7712,
+					Country: "KH",
+					Org:     "SABAY Sabay Digital Cambodia",
+				}},
 		},
 	}
 
@@ -82,10 +87,9 @@ func TestGetIPFromASN(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			i, err := client.GetData(tc.asn)
 			require.Nil(t, err)
-			// // Expecting true from comparision
 			for _, result := range tc.result {
 				x := compareResponse(i, result)
-				require.Equal(t, true, x)
+				require.True(t, x)
 			}
 		})
 	}
@@ -127,7 +131,7 @@ func TestGetASNFromOrg(t *testing.T) {
 			// // Expecting true from comparision
 			for _, result := range tc.result {
 				x := compareResponse(i, result)
-				require.Equal(t, true, x)
+				require.True(t, x)
 			}
 		})
 	}

@@ -17,20 +17,13 @@ import (
 	fileutil "github.com/projectdiscovery/utils/file"
 	stringsutil "github.com/projectdiscovery/utils/strings"
 	"golang.org/x/net/proxy"
-
-	"sync"
 )
 
 const serverURL = "https://api.asnmap.sh/"
 
-type Syncer struct {
-	dedup sync.Map
-}
-
 type Client struct {
 	url  *url.URL
 	http http.Client
-	sync *Syncer
 }
 
 // generatefullURL creates the complete URL with path, scheme, and host
@@ -71,7 +64,6 @@ func NewClient() (*Client, error) {
 	client := Client{
 		url:  URL,
 		http: http.Client{Transport: transCfg},
-		sync: &Syncer{},
 	}
 	return &client, nil
 }
@@ -169,9 +161,12 @@ func (c Client) makeRequest() ([]byte, error) {
 }
 
 func (c Client) GetData(input string) ([]*Response, error) {
-
+	inputToStore := input
 	switch IdentifyInput(input) {
 	case ASN:
+		inputToStore = strings.TrimPrefix(strings.ToLower(input), "as")
+		c.url.RawQuery = generateRawQuery("asn", inputToStore)
+	case ASNID:
 		c.url.RawQuery = generateRawQuery("asn", input)
 	case IP:
 		c.url.RawQuery = generateRawQuery("ip", input)
@@ -194,7 +189,7 @@ func (c Client) GetData(input string) ([]*Response, error) {
 
 	// insert original input in all responses
 	for _, result := range results {
-		result.Input = input
+		result.Input = inputToStore
 	}
 
 	return results, nil
