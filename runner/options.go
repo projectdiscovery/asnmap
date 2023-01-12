@@ -1,4 +1,4 @@
-package main
+package runner
 
 import (
 	"errors"
@@ -6,15 +6,16 @@ import (
 	"os"
 	"strings"
 
+	asnmap "github.com/projectdiscovery/asnmap/libs"
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/levels"
 	fileutil "github.com/projectdiscovery/utils/file"
 )
 
-var (
-	cfgFile string
-)
+type OnResultCallback func([]*asnmap.Response)
+
+var cfgFile string
 
 type Options struct {
 	FileInput     goflags.StringSlice
@@ -32,6 +33,7 @@ type Options struct {
 	Verbose       bool
 	Version       bool
 	DisplayIPv6   bool
+	OnResult      OnResultCallback
 }
 
 // configureOutput configures the output on the screen
@@ -79,7 +81,7 @@ func (options *Options) validateOptions() error {
 }
 
 // ParseOptions parses the command line options for application
-func parseOptions() *Options {
+func ParseOptions() *Options {
 	options := &Options{}
 	flagSet := goflags.NewFlagSet()
 	flagSet.SetDescription(`Go CLI and Library for quickly mapping organization network ranges using ASN information.`)
@@ -90,6 +92,7 @@ func parseOptions() *Options {
 		flagSet.StringSliceVarP(&options.Ip, "ip", "i", nil, " target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40:: ", goflags.FileNormalizedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Domain, "domain", "d", nil, " target domain to lookup, example: -d google.com, -d facebook.com", goflags.FileNormalizedStringSliceOptions),
 		flagSet.StringSliceVar(&options.Org, "org", nil, " target organization to lookup, example: -org GOOGLE", goflags.StringSliceOptions),
+		flagSet.StringSliceVarP(&options.FileInput, "file", "f", nil, "", goflags.CommaSeparatedStringSliceOptions),
 	)
 
 	flagSet.CreateGroup("configs", "Configurations",
@@ -109,9 +112,9 @@ func parseOptions() *Options {
 		flagSet.BoolVar(&options.Version, "version", false, "show version of the project"),
 	)
 
-	_ = flagSet.Parse()
-
-	flagSet.StringSliceVarP(&options.FileInput, "file", "f", nil, "", goflags.CommaSeparatedStringSliceOptions)
+	if err := flagSet.Parse(); err != nil {
+		gologger.Fatal().Msgf("%s\n", err)
+	}
 
 	// Read the inputs and configure the logging
 	options.configureOutput()

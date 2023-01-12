@@ -7,21 +7,22 @@ import (
 )
 
 func TestGetASNFromIP(t *testing.T) {
-	client := NewClient()
+	client, err := NewClient()
+	require.Nil(t, err)
 
 	tt := []struct {
 		name   string
 		ip     string
-		input  string
-		result []Response
+		result []*Response
 	}{
-		{"found", "100.19.12.21", "100.19.12.21", []Response{{FirstIp: "", LastIp: "", Input: "100.19.12.21", ASN: 701, Country: "US", Org: "UUNET"}}},
-		{"not found", "255.100.100.100", "255.100.100.100", []Response{}},
+		{"found", "100.19.12.21", []*Response{{FirstIp: "", LastIp: "", Input: "100.19.12.21", ASN: 701, Country: "US", Org: "UUNET"}}},
+		{"not found", "255.100.100.100", []*Response{}},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			i := client.GetData(IP(tc.ip), IP(tc.input))
+			i, err := client.GetData(tc.ip)
+			require.Nil(t, err)
 			// // Expecting true from comparision
 			for _, result := range tc.result {
 				x := compareResponse(i, result)
@@ -32,16 +33,16 @@ func TestGetASNFromIP(t *testing.T) {
 }
 
 func TestGetIPFromASN(t *testing.T) {
-	client := NewClient()
+	client, err := NewClient()
+	require.Nil(t, err)
 
 	tt := []struct {
 		name   string
 		asn    string
-		input  string
-		result []Response
+		result []*Response
 	}{
-		{"zero match", "1123", "1123", []Response{}},
-		{"single match", "14421", "14421", []Response{
+		{"zero match", "1123", []*Response{}},
+		{"single match", "14421", []*Response{
 			{
 				FirstIp: "216.101.17.0",
 				LastIp:  "216.101.17.255",
@@ -51,7 +52,7 @@ func TestGetIPFromASN(t *testing.T) {
 				Org:     "THERAVANCE"},
 		},
 		},
-		{"multi match", "7712", "7712", []Response{
+		{"multi match", "7712", []*Response{
 			{
 				FirstIp: "118.67.200.0",
 				LastIp:  "118.67.202.255",
@@ -79,7 +80,8 @@ func TestGetIPFromASN(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			i := client.GetData(ASN(tc.asn), ASN(tc.input))
+			i, err := client.GetData(tc.asn)
+			require.Nil(t, err)
 			// // Expecting true from comparision
 			for _, result := range tc.result {
 				x := compareResponse(i, result)
@@ -90,16 +92,16 @@ func TestGetIPFromASN(t *testing.T) {
 }
 
 func TestGetASNFromOrg(t *testing.T) {
-	client := NewClient()
+	client, err := NewClient()
+	require.Nil(t, err)
 
 	tt := []struct {
 		name   string
 		org    string
-		input  string
-		result []Response
+		result []*Response
 	}{
-		{"not found", "RANDOM_TEXT", "RANDON_TEXT", []Response{}},
-		{"regex match", "PPLINKNET*", "PPLINKNET", []Response{
+		{"not found", "RANDOM_TEXT", []*Response{}},
+		{"regex match", "PPLINKNET*", []*Response{
 			{
 				FirstIp: "45.239.52.0",
 				LastIp:  "45.239.55.255",
@@ -115,12 +117,13 @@ func TestGetASNFromOrg(t *testing.T) {
 				Country: "BR",
 				Org:     "PPLINKNET SERVICOS DE COMUNICACAO LTDA - ME"},
 		}},
-		{"exact match", "PPLINKNET", "PPLINKNET", []Response{}},
+		{"exact match", "PPLINKNET", []*Response{}},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			i := client.GetData(Org(tc.org), Org(tc.input))
+			i, err := client.GetData(tc.org)
+			require.Nil(t, err)
 			// // Expecting true from comparision
 			for _, result := range tc.result {
 				x := compareResponse(i, result)
@@ -132,7 +135,7 @@ func TestGetASNFromOrg(t *testing.T) {
 
 // compareResponse compares ASN & ORG against given domain with expected output's ASN & ORG
 // Have excluded IPs for now as they might change in future.
-func compareResponse(respA []Response, respB Response) bool {
+func compareResponse(respA []*Response, respB *Response) bool {
 	compareResult := false
 
 	for ind := range respA {

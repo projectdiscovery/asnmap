@@ -18,7 +18,6 @@ import (
 	stringsutil "github.com/projectdiscovery/utils/strings"
 	"golang.org/x/net/proxy"
 
-	"reflect"
 	"sync"
 )
 
@@ -157,17 +156,6 @@ func generateRawQuery(query, value string) string {
 	return query + "=" + value
 }
 
-func insertInputInResponse(input string, resp []Response) []Response {
-	expectedResponse := []Response{}
-
-	for _, res := range resp {
-		res.Input = input
-		expectedResponse = append(expectedResponse, res)
-	}
-
-	return expectedResponse
-}
-
 func (c Client) makeRequest() ([]byte, error) {
 	req, _ := http.NewRequest(http.MethodGet, c.url.String(), nil)
 	res, err := c.http.Do(req)
@@ -180,45 +168,34 @@ func (c Client) makeRequest() ([]byte, error) {
 	return resBody, nil
 }
 
-func (c Client) GetData(value interface{}, originalValue ...interface{}) ([]Response, error) {
-	var input interface{}
-	if len(originalValue) == 1 {
-		input = originalValue[0]
-	} else {
-		input = value
-	}
+func (c Client) GetData(input string) ([]*Response, error) {
 
-	outC := []Response{}
-	switch v := value.(type) {
+	switch IdentifyInput(input) {
 	case ASN:
-		c.url.RawQuery = generateRawQuery("asn", string(v))
+		c.url.RawQuery = generateRawQuery("asn", input)
 	case IP:
-		c.url.RawQuery = generateRawQuery("ip", string(v))
+		c.url.RawQuery = generateRawQuery("ip", input)
 	case Org:
-		c.url.RawQuery = generateRawQuery("org", string(v))
+		c.url.RawQuery = generateRawQuery("org", input)
+	case Unknown:
+		return nil, errors.New("unknown type")
 	}
+
 	resp, err := c.makeRequest()
-
 	if err != nil {
 		return nil, err
 	}
 
-	resultList := []Response{}
-	err = json.Unmarshal(resp, &resultList)
+	results := []*Response{}
+	err = json.Unmarshal(resp, &results)
 	if err != nil {
 		return nil, err
 	}
 
-	out, err := json.Marshal(resultList)
-	if err != nil {
-		return nil, err
+	// insert original input in all responses
+	for _, result := range results {
+		result.Input = input
 	}
 
-	hash := string(out)
-	if _, ok := c.sync.dedup.Load(hash); !ok {
-		c.sync.dedup.Store(hash, resultList)
-		outC = insertInputInResponse(reflect.ValueOf(input).String(), resultList)
-	}
-
-	return outC, nil
+	return results, nil
 }
