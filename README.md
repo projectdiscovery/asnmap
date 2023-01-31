@@ -61,10 +61,11 @@ Usage:
 
 Flags:
 INPUT:
-   -a, -asn string[]      target asn to lookup, example: -a AS5650
-   -i, -ip string[]       target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40:: 
-   -d, -domain string[]   target domain to lookup, example: -d google.com, -d facebook.com
-   -org string[]          target organization to lookup, example: -org GOOGLE
+   -a, -asn string[]     target asn to lookup, example: -a AS5650
+   -i, -ip string[]      target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40::
+   -d, -domain string[]  target domain to lookup, example: -d google.com, -d facebook.com
+   -org string[]         target organization to lookup, example: -org GOOGLE
+   -f, -file string[]    targets to lookup from file
 
 CONFIGURATIONS:
    -config string           path to the asnmap configuration file

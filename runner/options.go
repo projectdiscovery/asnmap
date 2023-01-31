@@ -88,17 +88,17 @@ func ParseOptions() *Options {
 
 	// Input
 	flagSet.CreateGroup("input", "Input",
-		flagSet.StringSliceVarP(&options.Asn, "asn", "a", nil, " target asn to lookup, example: -a AS5650", goflags.FileNormalizedStringSliceOptions),
-		flagSet.StringSliceVarP(&options.Ip, "ip", "i", nil, " target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40:: ", goflags.FileNormalizedStringSliceOptions),
-		flagSet.StringSliceVarP(&options.Domain, "domain", "d", nil, " target domain to lookup, example: -d google.com, -d facebook.com", goflags.FileNormalizedStringSliceOptions),
-		flagSet.StringSliceVar(&options.Org, "org", nil, " target organization to lookup, example: -org GOOGLE", goflags.StringSliceOptions),
-		flagSet.StringSliceVarP(&options.FileInput, "file", "f", nil, "", goflags.CommaSeparatedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Asn, "asn", "a", nil, "target asn to lookup, example: -a AS5650", goflags.FileNormalizedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Ip, "ip", "i", nil, "target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40:: ", goflags.FileNormalizedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Domain, "domain", "d", nil, "target domain to lookup, example: -d google.com, -d facebook.com", goflags.FileNormalizedStringSliceOptions),
+		flagSet.StringSliceVar(&options.Org, "org", nil, "target organization to lookup, example: -org GOOGLE", goflags.StringSliceOptions),
+		flagSet.StringSliceVarP(&options.FileInput, "file", "f", nil, "targets to lookup from file", goflags.CommaSeparatedStringSliceOptions),
 	)
 
 	flagSet.CreateGroup("configs", "Configurations",
 		flagSet.StringVar(&cfgFile, "config", "", "path to the asnmap configuration file"),
 		flagSet.StringSliceVarP(&options.Resolvers, "resolvers", "r", nil, "list of resolvers to use", goflags.FileCommaSeparatedStringSliceOptions),
-		flagSet.StringSliceVarP(&options.Proxy, "proxy", "p", nil, " list of proxy to use (comma separated or file input)", goflags.FileCommaSeparatedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Proxy, "proxy", "p", nil, "list of proxy to use (comma separated or file input)", goflags.FileCommaSeparatedStringSliceOptions),
 	)
 
 	// Output
