@@ -1,6 +1,5 @@
 name: 🔨 Build Test
 on:
-  push:
   pull_request:
   workflow_dispatch:
 
@@ -12,10 +11,18 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
 
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Build client
-        run: make cli
+      - name: Build
+        run: go build .
+        working-directory: cmd/asnmap/
+
+      - name: Example Code Tests
+        run: go build .
+        working-directory: examples/
+
+      - name: Run test
+        run: go test ./...

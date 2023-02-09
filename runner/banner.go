@@ -1,4 +1,4 @@
-package main
+package runner
 
 import "github.com/projectdiscovery/gologger"
 
@@ -7,11 +7,11 @@ const banner = `
   / _ | / __/ |/ /_ _  ___ ____ 
  / __ |_\ \/    /  ' \/ _  / _ \
 /_/ |_/___/_/|_/_/_/_/\_,_/ .__/
-                         /_/    v0.0.1  
+                         /_/    v1.0.0  
 `
 
 // Version is the current version of mapcidr
-const Version = `v0.0.1`
+const Version = `v1.0.0`
 
 // showBanner is used to show the banner to the user
 func showBanner() {

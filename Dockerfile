@@ -1,7 +1,7 @@
 ##
 ##Build
 ##
-FROM golang:1.18 AS builder
+FROM golang:1.20.0 AS builder
 
 WORKDIR /asnmap
 
@@ -12,7 +12,7 @@ RUN go build -o "asnmap" ./cmd/asnmap/
 #
 #Deploy
 #
-FROM alpine:3.16.2
+FROM alpine:3.17.1
 
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2 && \
     apk update && \
