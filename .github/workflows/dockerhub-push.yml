@@ -17,8 +17,8 @@ jobs:
       - name: Get Github tag
         id: meta
         run: |
-          echo "::set-output name=tag::$(curl --silent --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json' \
-          "https://api.github.com/repos/projectdiscovery/asnmap/releases/latest" | jq -r .tag_name)"
+          curl --silent "https://api.github.com/repos/projectdiscovery/asnmap/releases/latest" | jq -r .tag_name | xargs -I {} echo TAG={} >> $GITHUB_OUTPUT
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -37,4 +37,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: projectdiscovery/asnmap:latest,projectdiscovery/asnmap:${{ steps.meta.outputs.tag }}
+          tags: projectdiscovery/asnmap:latest,projectdiscovery/asnmap:${{ steps.meta.outputs.TAG }}
