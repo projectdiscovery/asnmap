@@ -4,19 +4,18 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/projectdiscovery/gologger"
 	"github.com/stretchr/testify/require"
 )
 
 func TestGetFormattedDataInJson(t *testing.T) {
 	tt := []struct {
 		name           string
-		inputResponse  []Response
-		expectedOutput Result
+		inputResponse  []*Response
+		expectedOutput *Result
 	}{
 		{
 			name: "ASN",
-			inputResponse: []Response{
+			inputResponse: []*Response{
 				{
 					FirstIp: "216.101.17.0",
 					LastIp:  "216.101.17.255",
@@ -25,7 +24,7 @@ func TestGetFormattedDataInJson(t *testing.T) {
 					Country: "US",
 					Org:     "THERAVANCE"},
 			},
-			expectedOutput: Result{
+			expectedOutput: &Result{
 				Timestamp:  "",
 				Input:      "AS14421",
 				ASN:        "AS14421",
@@ -37,12 +36,11 @@ func TestGetFormattedDataInJson(t *testing.T) {
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			output := GetFormattedDataInJson(tc.inputResponse)
-			var actualOutput Result
-			err := json.Unmarshal(output, &actualOutput)
-			if err != nil {
-				gologger.Fatal().Msg(err.Error())
-			}
+			output, err := GetFormattedDataInJson(tc.inputResponse)
+			require.Nil(t, err)
+			var actualOutput *Result
+			err = json.Unmarshal(output, &actualOutput)
+			require.Nil(t, err)
 
 			// Ignoring timestamp from acutal output
 			actualOutput.Timestamp = ""
@@ -54,19 +52,20 @@ func TestGetFormattedDataInJson(t *testing.T) {
 func TestGetFormattedDataInCSV(t *testing.T) {
 	tt := []struct {
 		name           string
-		inputResponse  []Response
+		inputResponse  []*Response
 		expectedOutput [][]string
 	}{
 		{
 			name: "ASN",
-			inputResponse: []Response{
+			inputResponse: []*Response{
 				{
 					FirstIp: "216.101.17.0",
 					LastIp:  "216.101.17.255",
 					Input:   "14421",
 					ASN:     14421,
 					Country: "US",
-					Org:     "THERAVANCE"},
+					Org:     "THERAVANCE",
+				},
 			},
 			expectedOutput: [][]string{
 				{"", "AS14421", "AS14421", "THERAVANCE", "US", "216.101.17.0/24"},
@@ -74,7 +73,7 @@ func TestGetFormattedDataInCSV(t *testing.T) {
 		},
 		{
 			name: "Org",
-			inputResponse: []Response{
+			inputResponse: []*Response{
 				{
 					FirstIp: "45.239.52.0",
 					LastIp:  "45.239.55.255",
@@ -99,7 +98,7 @@ func TestGetFormattedDataInCSV(t *testing.T) {
 		},
 		{
 			name: "IP",
-			inputResponse: []Response{
+			inputResponse: []*Response{
 				{
 					FirstIp: "104.16.0.0",
 					LastIp:  "104.21.127.255",
@@ -116,7 +115,8 @@ func TestGetFormattedDataInCSV(t *testing.T) {
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			actualOutput := GetFormattedDataInCSV(tc.inputResponse)
+			actualOutput, err := GetFormattedDataInCSV(tc.inputResponse)
+			require.Nil(t, err)
 
 			// Ignoring timestamp from acutal output
 			for _, output := range actualOutput {

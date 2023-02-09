@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/projectdiscovery/goflags v0.1.6
 	github.com/projectdiscovery/gologger v1.1.7
+	github.com/projectdiscovery/hmap v0.0.6
 	github.com/projectdiscovery/mapcidr v1.0.3
 	github.com/projectdiscovery/retryabledns v1.0.20
 	github.com/stretchr/testify v1.8.1
@@ -12,7 +13,7 @@ require (
 )
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
+	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/cnf/structhash v0.0.0-20201127153200-e1b16c1ebc08 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -41,15 +42,45 @@ require (
 )
 
 require (
+	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/Mzack9999/go-http-digest-auth-client v0.6.1-0.20220414142836-eb8883508809 // indirect
+	github.com/akrylysov/pogreb v0.10.1 // indirect
+	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/cockroachdb/errors v1.9.0 // indirect
+	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
+	github.com/cockroachdb/pebble v0.0.0-20221229212011-811a8c0e741b // indirect
+	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/dsnet/compress v0.0.1 // indirect
-	github.com/golang/snappy v0.0.3 // indirect
+	github.com/getsentry/sentry-go v0.16.0 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/snappy v0.0.4 // indirect
+	github.com/klauspost/compress v1.15.13 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
+	github.com/kr/text v0.2.0 // indirect
+	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mholt/archiver v3.1.1+incompatible // indirect
 	github.com/nwaples/rardecode v1.1.0 // indirect
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
+	github.com/prometheus/client_golang v1.14.0 // indirect
+	github.com/prometheus/client_model v0.3.0 // indirect
+	github.com/prometheus/common v0.39.0 // indirect
+	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
+	github.com/syndtr/goleveldb v1.0.0 // indirect
+	github.com/tidwall/btree v1.4.3 // indirect
+	github.com/tidwall/buntdb v1.2.10 // indirect
+	github.com/tidwall/gjson v1.14.3 // indirect
+	github.com/tidwall/grect v0.1.4 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
+	github.com/tidwall/rtred v0.1.2 // indirect
+	github.com/tidwall/tinyqueue v0.1.1 // indirect
 	github.com/ulikunitz/xz v0.5.7 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
-	golang.org/x/exp v0.0.0-20221019170559-20944726eadf // indirect
+	go.etcd.io/bbolt v1.3.6 // indirect
+	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/djherbis/times.v1 v1.3.0 // indirect
 )

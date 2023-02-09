@@ -1,6 +1,5 @@
 name: 🙏🏻 Lint Test
 on:
-  push:
   pull_request:
   workflow_dispatch:
 
@@ -11,10 +10,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: "Set up Go"
         uses: actions/setup-go@v3
         with: 
           go-version: 1.18
+          
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3.4.0
         with:

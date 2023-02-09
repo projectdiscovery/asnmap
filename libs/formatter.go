@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/projectdiscovery/gologger"
 )
 
 // To model json & csv formatted output
@@ -47,48 +45,59 @@ func convertIPsToStringSlice(ips []*net.IPNet) []string {
 	return res
 }
 
-func intializeResult(resp Response) Result {
-	result := Result{}
+func intializeResult(resp *Response) (*Result, error) {
+	result := &Result{}
 	result.Timestamp = time.Now().Local().String()
 	result.Input = attachPrefix(resp.Input)
 	result.ASN = attachPrefix(strconv.Itoa(resp.ASN))
 	result.ASN_org = resp.Org
 	result.AS_country = resp.Country
-	result.AS_range = convertIPsToStringSlice(GetCIDR([]Response{resp}))
-	return result
-}
-
-func prepareFormattedJSON(input Response) []byte {
-	result := intializeResult(input)
-	output, err := json.Marshal(result)
+	cidrs, err := GetCIDR([]*Response{resp})
 	if err != nil {
-		gologger.Fatal().Msg(err.Error())
+		return nil, err
 	}
-	return output
+	result.AS_range = convertIPsToStringSlice(cidrs)
+	return result, nil
 }
 
-func prepareFormattedCSV(input Response) []string {
-	var record []string
-	result := intializeResult(input)
-	record = append(record, result.Timestamp, result.Input, result.ASN, result.ASN_org, result.AS_country, strings.Join(result.AS_range, ","))
-	return record
+func prepareFormattedJSON(input *Response) ([]byte, error) {
+	result, err := intializeResult(input)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(result)
 }
 
-func GetFormattedDataInJson(output []Response) []byte {
+func prepareFormattedCSV(input *Response) ([]string, error) {
+	result, err := intializeResult(input)
+	if err != nil {
+		return nil, err
+	}
+	record := []string{result.Timestamp, result.Input, result.ASN, result.ASN_org, result.AS_country, strings.Join(result.AS_range, ",")}
+	return record, nil
+}
+
+func GetFormattedDataInJson(output []*Response) ([]byte, error) {
 	var jsonOutput []byte
 	for _, res := range output {
-		jsonOutput = append(jsonOutput, prepareFormattedJSON(res)...)
+		json, err := prepareFormattedJSON(res)
+		if err != nil {
+			return nil, err
+		}
+		jsonOutput = append(jsonOutput, json...)
 	}
-	return jsonOutput
+	return jsonOutput, nil
 }
 
-func GetFormattedDataInCSV(output []Response) [][]string {
+func GetFormattedDataInCSV(output []*Response) ([][]string, error) {
 	records := [][]string{}
-
 	for _, res := range output {
-		record := prepareFormattedCSV(res)
+		record, err := prepareFormattedCSV(res)
+		if err != nil {
+			return nil, err
+		}
 		records = append(records, record)
 	}
 
-	return records
+	return records, nil
 }

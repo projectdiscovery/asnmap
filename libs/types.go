@@ -1,42 +1,58 @@
 package asnmap
 
 import (
-	"net"
 	"regexp"
-	"strconv"
-	"strings"
+
+	"github.com/asaskevich/govalidator"
+	iputil "github.com/projectdiscovery/utils/ip"
+	stringsutil "github.com/projectdiscovery/utils/strings"
 )
 
-type ASN string
+type InputType uint8
 
-type IP string
-
-type Org string
-
-type Domain string
+const (
+	ASN InputType = iota
+	ASNID
+	IP
+	Org
+	Domain
+	Unknown
+)
 
 var domainRegex = regexp.MustCompile(`^(?i)[a-z0-9-]+(\.[a-z0-9-]+)+\.?$`)
 
-/*
-checkIfASN checks if the given input is ASN or not, 
-its possible to have an org name starting with AS/as prefix.
-*/
+// checkIfASN checks if the given input is ASN or not,
+// its possible to have an org name starting with AS/as prefix.
 func checkIfASN(input string) bool {
-	_, err := strconv.Atoi(input[2:])
-	return strings.HasPrefix(strings.ToUpper(input), "AS") && err == nil
+	if len(input) == 0 {
+		return false
+	}
+	hasASNPrefix := stringsutil.HasPrefixI(input, "AS")
+	if hasASNPrefix {
+		input = input[2:]
+	}
+	return hasASNPrefix && checkIfASNId(input)
 }
 
-func IdentifyInput(input string) interface{} {
-	var ret interface{}
-	if v := net.ParseIP(input); v != nil {
-		ret = IP(input)
-	} else if checkIfASN(input) {
-		ret = ASN(input[2:])
-	} else if domainRegex.MatchString(input) {
-		ret = Domain(input)
-	} else {
-		ret = Org(input)
+func checkIfASNId(input string) bool {
+	if len(input) == 0 {
+		return false
 	}
+	hasNumericId := input != "" && govalidator.IsNumeric(input)
+	return hasNumericId
+}
 
-	return ret
+func IdentifyInput(input string) InputType {
+	switch {
+	case iputil.IsIP(input):
+		return IP
+	case checkIfASN(input):
+		return ASN
+	case checkIfASNId(input):
+		return ASNID
+	case domainRegex.MatchString(input):
+		return Domain
+	default:
+		return Org
+	}
 }

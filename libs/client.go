@@ -14,40 +14,35 @@ import (
 	"strings"
 	"time"
 
-	"github.com/projectdiscovery/gologger"
 	fileutil "github.com/projectdiscovery/utils/file"
+	stringsutil "github.com/projectdiscovery/utils/strings"
 	"golang.org/x/net/proxy"
-
-	"reflect"
-	"sync"
 )
 
 const serverURL = "https://api.asnmap.sh/"
 
-type Syncer struct {
-	dedup sync.Map
-}
-
 type Client struct {
-	url  url.URL
+	url  *url.URL
 	http http.Client
-	sync *Syncer
 }
 
 // generatefullURL creates the complete URL with path, scheme, and host
-func generateFullURL(host string) string {
-	rawURL, _ := url.Parse(host)
-
-	if rawURL.Scheme != "http" && rawURL.Scheme != "https" {
-		gologger.Fatal().Msgf("Host should start with http or https.")
+func generateFullURL(host string) (*url.URL, error) {
+	rawURL, err := url.Parse(host)
+	if err != nil {
+		return nil, err
 	}
 
-	u := url.URL{Scheme: rawURL.Scheme, Host: rawURL.Host, Path: "api/v1/asnmap"}
-	return u.String()
+	if !stringsutil.EqualFoldAny(rawURL.Scheme, "http", "https") {
+		return nil, errors.New("Host should start with http or https.")
+	}
+
+	rawURL.Path = "api/v1/asnmap"
+	return rawURL, nil
 }
 
 // If SERVER_URL env provider use that else use serverURL constant
-func getURL() string {
+func getURL() (*url.URL, error) {
 	url := os.Getenv("SERVER_URL")
 	if url == "" {
 		url = serverURL
@@ -55,9 +50,11 @@ func getURL() string {
 	return generateFullURL(url)
 }
 
-func NewClient() *Client {
-	URL := getURL()
-	u, _ := url.Parse(URL)
+func NewClient() (*Client, error) {
+	URL, err := getURL()
+	if err != nil {
+		return nil, err
+	}
 
 	// ignore expired SSL certificates
 	transCfg := &http.Transport{
@@ -65,19 +62,14 @@ func NewClient() *Client {
 	}
 
 	client := Client{
-		url: url.URL{
-			Scheme: u.Scheme,
-			Host:   u.Host,
-			Path:   u.Path,
-		},
+		url:  URL,
 		http: http.Client{Transport: transCfg},
-		sync: &Syncer{},
 	}
-	return &client
+	return &client, nil
 }
 
 // SetProxy adds a proxy to the client
-func (c *Client) SetProxy(proxyList []string) error {
+func (c *Client) SetProxy(proxyList []string) (*url.URL, error) {
 	var (
 		proxyUrl *url.URL
 		err      error
@@ -90,11 +82,10 @@ func (c *Client) SetProxy(proxyList []string) error {
 			proxyUrl, err = c.setProxy(p)
 		}
 		if err == nil && proxyUrl != nil {
-			gologger.Info().Msgf("Using %s proxy %s", proxyUrl.Scheme, proxyUrl.String())
-			return nil
+			return proxyUrl, nil
 		}
 	}
-	return errors.New("no valid proxy found")
+	return nil, errors.New("no valid proxy found")
 }
 
 // setProxyFromFile reads the file contents and tries to set the proxy
@@ -157,17 +148,6 @@ func generateRawQuery(query, value string) string {
 	return query + "=" + value
 }
 
-func insertInputInResponse(input string, resp []Response) []Response {
-	expectedResponse := []Response{}
-
-	for _, res := range resp {
-		res.Input = input
-		expectedResponse = append(expectedResponse, res)
-	}
-
-	return expectedResponse
-}
-
 func (c Client) makeRequest() ([]byte, error) {
 	req, _ := http.NewRequest(http.MethodGet, c.url.String(), nil)
 	res, err := c.http.Do(req)
@@ -180,46 +160,37 @@ func (c Client) makeRequest() ([]byte, error) {
 	return resBody, nil
 }
 
-func (c Client) GetData(value interface{}, originalValue ...interface{}) []Response {
-
-	var input interface{}
-	if len(originalValue) == 1 {
-		input = originalValue[0]
-	} else {
-		input = value
-	}
-
-	outC := []Response{}
-	switch v := value.(type) {
+func (c Client) GetData(input string) ([]*Response, error) {
+	inputToStore := input
+	switch IdentifyInput(input) {
 	case ASN:
-		c.url.RawQuery = generateRawQuery("asn", string(v))
+		inputToStore = strings.TrimPrefix(strings.ToLower(input), "as")
+		c.url.RawQuery = generateRawQuery("asn", inputToStore)
+	case ASNID:
+		c.url.RawQuery = generateRawQuery("asn", input)
 	case IP:
-		c.url.RawQuery = generateRawQuery("ip", string(v))
+		c.url.RawQuery = generateRawQuery("ip", input)
 	case Org:
-		c.url.RawQuery = generateRawQuery("org", string(v))
+		c.url.RawQuery = generateRawQuery("org", input)
+	case Unknown:
+		return nil, errors.New("unknown type")
 	}
+
 	resp, err := c.makeRequest()
-
 	if err != nil {
-		gologger.Fatal().Msgf("%s\n", err)
+		return nil, err
 	}
 
-	resultList := []Response{}
-	err = json.Unmarshal(resp, &resultList)
+	results := []*Response{}
+	err = json.Unmarshal(resp, &results)
 	if err != nil {
-		gologger.Fatal().Msg(err.Error())
+		return nil, err
 	}
 
-	out, err := json.Marshal(resultList)
-	if err != nil {
-		gologger.Fatal().Msg(err.Error())
+	// insert original input in all responses
+	for _, result := range results {
+		result.Input = inputToStore
 	}
 
-	hash := string(out)
-	if _, ok := c.sync.dedup.Load(hash); !ok {
-		c.sync.dedup.Store(hash, resultList)
-		outC = insertInputInResponse(reflect.ValueOf(input).String(), resultList)
-	}
-
-	return outC
+	return results, nil
 }

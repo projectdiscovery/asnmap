@@ -61,10 +61,11 @@ Usage:
 
 Flags:
 INPUT:
-   -a, -asn string[]      target asn to lookup, example: -a AS5650
-   -i, -ip string[]       target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40:: 
-   -d, -domain string[]   target domain to lookup, example: -d google.com, -d facebook.com
-   -org string[]          target organization to lookup, example: -org GOOGLE
+   -a, -asn string[]     target asn to lookup, example: -a AS5650
+   -i, -ip string[]      target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40::
+   -d, -domain string[]  target domain to lookup, example: -d google.com, -d facebook.com
+   -org string[]         target organization to lookup, example: -org GOOGLE
+   -f, -file string[]    targets to lookup from file
 
 CONFIGURATIONS:
    -config string           path to the asnmap configuration file
@@ -195,46 +196,7 @@ Output of asnmap can be directly piped into other projects in workflow accepting
 
 ## Use asnmap as a library
 
-It's possible to use the library directly in your go programs. The following code snippets outline how to get cidr ranges from given input
-
-```go
-package main
-
-import (
-	"github.com/projectdiscovery/asnmap"
-	"fmt"
-)
-
-func main() {
-	client := asnmap.NewClient()
-
-	// Query based on ASN
-	asn := "14421"
-	ASN := asnmap.ASN(asn)
-	results := asnmap.GetFormattedDataInJson(client.GetData(ASN))
-	fmt.Println(string(results))
-
-	// Query based on IP
-	ip := "210.10.122.10"
-	IP := asnmap.IP(ip)
-	results = asnmap.GetFormattedDataInJson(client.GetData(IP))
-	fmt.Println(string(results))
-
-	// Query based on Organization
-	org := "pplinknet"
-	ORG := asnmap.Org(org)
-	results = asnmap.GetFormattedDataInJson(client.GetData(ORG))
-	fmt.Println(string(results))
-
-	// Query based on domain
-	domain := "hackerone.com"
-	resolvedIps := asnmap.ResolveDomain(domain)
-	for _, ip := range resolvedIps {
-		results = asnmap.GetFormattedDataInJson(client.GetData(asnmap.IP(ip), asnmap.Domain(domain)))
-		fmt.Println(string(results))
-	}
-}
-```
+Examples of using asnmap from Go code are provided in the [examples](examples/) folder.
 
 ## Acknowledgements
 
