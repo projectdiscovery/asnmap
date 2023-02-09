@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"net"
+	"strings"
 
 	asnmap "github.com/projectdiscovery/asnmap/libs"
 	iputil "github.com/projectdiscovery/utils/ip"
@@ -26,19 +27,28 @@ func (r *Runner) writeToCsv(records [][]string) error {
 	return w.Error()
 }
 
-// filterIPv6() returns both IPv6, IPv4 if DisplayIPv6 is enabled, else return only IPv4
-func (r *Runner) filterIPv6(ips []*net.IPNet) []*net.IPNet {
+// filterIPv6
+// - DisplayIPv6==true => returns IPv6 + IPv4
+// - DisplayIPv6==false => returns IPv4
+func (r *Runner) filterIPv6(ipsnet []*net.IPNet) []*net.IPNet {
 	if r.options.DisplayIPv6 {
-		return ips
+		// ipv4 + ipv6
+		return ipsnet
 	}
 
-	var filteredIps []*net.IPNet
-	for _, ip := range ips {
-		if !iputil.IsIPv6(ip.String()) {
-			filteredIps = append(filteredIps, ip)
+	// only ipv4
+	var filteredIpsNet []*net.IPNet
+	for _, ipnet := range ipsnet {
+		value := ipnet.String()
+		// trim net suffix
+		if idx := strings.Index(value, "/"); idx >= 0 {
+			value = value[:idx]
+		}
+		if iputil.IsIPv4(value) {
+			filteredIpsNet = append(filteredIpsNet, ipnet)
 		}
 	}
-	return filteredIps
+	return filteredIpsNet
 }
 
 // writeOutput either to file or to stdout
