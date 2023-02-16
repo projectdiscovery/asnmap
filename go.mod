@@ -6,7 +6,7 @@ require (
 	github.com/projectdiscovery/goflags v0.1.6
 	github.com/projectdiscovery/gologger v1.1.7
 	github.com/projectdiscovery/hmap v0.0.8
-	github.com/projectdiscovery/mapcidr v1.0.3
+	github.com/projectdiscovery/mapcidr v1.1.0
 	github.com/projectdiscovery/retryabledns v1.0.20
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/net v0.7.0
@@ -26,10 +26,8 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/projectdiscovery/blackrock v0.0.0-20220628111055-35616c71b2dc // indirect
+	github.com/projectdiscovery/blackrock v0.0.0-20221025011524-9e4efe804fb4 // indirect
 	github.com/projectdiscovery/retryablehttp-go v1.0.8 // indirect
-	github.com/projectdiscovery/sliceutil v0.0.1 // indirect
-	github.com/projectdiscovery/stringsutil v0.0.2 // indirect
 	github.com/projectdiscovery/utils v0.0.7
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
 	go.uber.org/atomic v1.10.0 // indirect
