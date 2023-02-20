@@ -260,8 +260,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/projectdiscovery/blackrock v0.0.0-20221025011524-9e4efe804fb4 h1:EsrQ/zkotVodSJLOch3pV/UYt1vQcwyIs5HX0sm1ljE=
 github.com/projectdiscovery/blackrock v0.0.0-20221025011524-9e4efe804fb4/go.mod h1:5tNGQP9kOfW+X5+40pZP8aqPYLHs45nJkFaSHLxdeH8=
-github.com/projectdiscovery/goflags v0.1.6 h1:EXigzX4lJmn/fLMnULdc03O7WW+DjiYZhNgdGvfg+Z4=
-github.com/projectdiscovery/goflags v0.1.6/go.mod h1:yILgA7gbrHuTpIvMfikbivzoxkyxBD1Y5/PRHiGTIFk=
+github.com/projectdiscovery/goflags v0.1.7 h1:KvMs1KnXMWRhJiJj6K+cWurTWpbDYYlo+1cyGvf1YCc=
+github.com/projectdiscovery/goflags v0.1.7/go.mod h1:yILgA7gbrHuTpIvMfikbivzoxkyxBD1Y5/PRHiGTIFk=
 github.com/projectdiscovery/gologger v1.1.8 h1:CFlCzGlqAhPqWIrAXBt1OVh5jkMs1qgoR/z4xhdzLNE=
 github.com/projectdiscovery/gologger v1.1.8/go.mod h1:bNyVaC1U/NpJtFkJltcesn01NR3K8Hg6RsLVce6yvrw=
 github.com/projectdiscovery/hmap v0.0.8 h1:4Jn3H0gHeibJAvJuyVIZMszzALOurd8PKmgRrXfuhLc=
