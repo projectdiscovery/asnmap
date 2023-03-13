@@ -9,7 +9,7 @@ builds:
 # release options (https://goreleaser.com/customization/release/)
 
 release:
-  draft: true
+  draft: false
   prerelease: auto
 
 archives:
