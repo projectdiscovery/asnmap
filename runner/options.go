@@ -11,6 +11,7 @@ import (
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/levels"
 	fileutil "github.com/projectdiscovery/utils/file"
+	updateutils "github.com/projectdiscovery/utils/update"
 )
 
 type OnResultCallback func([]*asnmap.Response)
@@ -18,22 +19,23 @@ type OnResultCallback func([]*asnmap.Response)
 var cfgFile string
 
 type Options struct {
-	FileInput     goflags.StringSlice
-	Resolvers     goflags.StringSlice
-	Asn           goflags.StringSlice
-	Domain        goflags.StringSlice
-	Ip            goflags.StringSlice
-	Org           goflags.StringSlice
-	Proxy         goflags.StringSlice
-	OutputFile    string
-	Output        io.Writer
-	DisplayInJSON bool
-	DisplayInCSV  bool
-	Silent        bool
-	Verbose       bool
-	Version       bool
-	DisplayIPv6   bool
-	OnResult      OnResultCallback
+	FileInput          goflags.StringSlice
+	Resolvers          goflags.StringSlice
+	Asn                goflags.StringSlice
+	Domain             goflags.StringSlice
+	Ip                 goflags.StringSlice
+	Org                goflags.StringSlice
+	Proxy              goflags.StringSlice
+	OutputFile         string
+	Output             io.Writer
+	DisplayInJSON      bool
+	DisplayInCSV       bool
+	Silent             bool
+	Verbose            bool
+	Version            bool
+	DisplayIPv6        bool
+	OnResult           OnResultCallback
+	DisableUpdateCheck bool
 }
 
 // configureOutput configures the output on the screen
@@ -95,10 +97,17 @@ func ParseOptions() *Options {
 		flagSet.StringSliceVarP(&options.FileInput, "file", "f", nil, "targets to lookup from file", goflags.CommaSeparatedStringSliceOptions),
 	)
 
+	// Configs
 	flagSet.CreateGroup("configs", "Configurations",
 		flagSet.StringVar(&cfgFile, "config", "", "path to the asnmap configuration file"),
 		flagSet.StringSliceVarP(&options.Resolvers, "resolvers", "r", nil, "list of resolvers to use", goflags.FileCommaSeparatedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Proxy, "proxy", "p", nil, "list of proxy to use (comma separated or file input)", goflags.FileCommaSeparatedStringSliceOptions),
+	)
+
+	// Update
+	flagSet.CreateGroup("update", "Update",
+		flagSet.CallbackVarP(GetUpdateCallback(), "update", "up", "update asnmap to latest version"),
+		flagSet.BoolVarP(&options.DisableUpdateCheck, "disable-update-check", "duc", false, "disable automatic asnmap update check"),
 	)
 
 	// Output
@@ -130,11 +139,22 @@ func ParseOptions() *Options {
 	}
 
 	if options.Version {
-		gologger.Info().Msgf("Current Version: %s\n", Version)
+		gologger.Info().Msgf("Current Version: %s\n", version)
 		os.Exit(0)
 	}
 
 	showBanner()
+
+	if !options.DisableUpdateCheck {
+		latestVersion, err := updateutils.GetVersionCheckCallback("asnmap")()
+		if err != nil {
+			if options.Verbose {
+				gologger.Error().Msgf("asnmap version check failed: %v", err.Error())
+			}
+		} else {
+			gologger.Info().Msgf("Current asnmap version %v %v", version, updateutils.GetVersionDescription(version, latestVersion))
+		}
+	}
 
 	if err := options.validateOptions(); err != nil {
 		gologger.Fatal().Msgf("%s\n", err)

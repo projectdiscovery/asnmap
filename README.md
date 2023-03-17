@@ -71,6 +71,10 @@ CONFIGURATIONS:
    -config string           path to the asnmap configuration file
    -r, -resolvers string[]  list of resolvers to use
 
+UPDATE:
+   -up, -update                 update asnmap to latest version
+   -duc, -disable-update-check  disable automatic asnmap update check
+
 OUTPUT:
    -o, -output string  file to write output to
    -j, -json           display json format output
