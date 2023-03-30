@@ -189,7 +189,7 @@ timestamp|input|as_number|as_name|as_country|as_range
 Output of asnmap can be directly piped into other projects in workflow accepting stdin as input, for example:
 
 - `echo AS54115 | asnmap | tlsx`
-- `echo AS54115 | asnmap | asnmap -ptr`
+- `echo AS54115 | asnmap | dnsx -ptr`
 - `echo AS54115 | asnmap | naabu -p 443`
 - `echo AS54115 | asnmap | naabu -p 443 | httpx`
 - `echo AS54115 | asnmap | naabu -p 443 | httpx | nuclei -id tech-detect`
