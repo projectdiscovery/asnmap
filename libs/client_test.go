@@ -21,7 +21,7 @@ func TestGetASNFromIP(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			i, err := client.GetData(tc.ip)
+			i, err := client.GetData(tc.ip, "")
 			require.Nil(t, err)
 			// // Expecting true from comparision
 			for _, result := range tc.result {
@@ -85,7 +85,7 @@ func TestGetIPFromASN(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			i, err := client.GetData(tc.asn)
+			i, err := client.GetData(tc.asn, "")
 			require.Nil(t, err)
 			for _, result := range tc.result {
 				x := compareResponse(i, result)
@@ -126,7 +126,7 @@ func TestGetASNFromOrg(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			i, err := client.GetData(tc.org)
+			i, err := client.GetData(tc.org, "")
 			require.Nil(t, err)
 			// // Expecting true from comparision
 			for _, result := range tc.result {
