@@ -92,7 +92,7 @@ func (r *Runner) process() error {
 			}
 
 			for _, resolvedIp := range resolvedIps {
-				ls, err := r.client.GetData(resolvedIp)
+				ls, err := r.client.GetData(resolvedIp, item)
 				if err != nil {
 					errProcess = err
 					return err
@@ -104,7 +104,7 @@ func (r *Runner) process() error {
 			}
 
 		default:
-			ls, err := r.client.GetData(item)
+			ls, err := r.client.GetData(item, "")
 			if err != nil {
 				errProcess = err
 				return err
