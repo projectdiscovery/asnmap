@@ -37,7 +37,7 @@ func main() {
 }
 
 func handleInput(client *asnmap.Client, item string) {
-	results, err := client.GetData(item)
+	results, err := client.GetData(item, "")
 	if err != nil {
 		log.Fatal(err)
 	}
