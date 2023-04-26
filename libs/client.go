@@ -160,7 +160,15 @@ func (c Client) makeRequest() ([]byte, error) {
 	return resBody, nil
 }
 
-func (c Client) GetData(input string) ([]*Response, error) {
+func (c Client) GetDataWithCustomInput(inputToQuery, inputToUseInResponse string) ([]*Response, error) {
+	results, err := c.GetData(inputToQuery)
+	for _, result := range results {
+		result.Input = inputToUseInResponse
+	}
+	return results, err
+}
+
+func (c Client) GetData(input string, medatadas ...string) ([]*Response, error) {
 	inputToStore := input
 	switch IdentifyInput(input) {
 	case ASN:
