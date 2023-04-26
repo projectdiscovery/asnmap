@@ -21,12 +21,12 @@ func TestRunner(t *testing.T) {
 			},
 			expectedOutput: []*asnmap.Response{
 				{
-					FirstIp: "104.16.0.0",
-					LastIp:  "104.21.127.255",
+					FirstIp: "102.129.206.0",
+					LastIp:  "127.255.255.255",
 					Input:   "104.16.99.52",
-					ASN:     13335,
-					Country: "US",
-					Org:     "CLOUDFLARENET"},
+					ASN:     9498,
+					Country: "IN",
+					Org:     "BBIL-AP BHARTI Airtel Ltd."},
 			},
 		},
 		{
