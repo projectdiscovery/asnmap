@@ -10,11 +10,11 @@ const banner = `
   / _ | / __/ |/ /_ _  ___ ____ 
  / __ |_\ \/    /  ' \/ _  / _ \
 /_/ |_/___/_/|_/_/_/_/\_,_/ .__/
-                         /_/    v1.0.2  
+                         /_/ 
 `
 
 // version is the current version of asnmap
-const version = `v1.0.2`
+const version = `v1.0.3`
 
 // showBanner is used to show the banner to the user
 func showBanner() {
