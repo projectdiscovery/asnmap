@@ -1,8 +1,8 @@
 package runner
 
 import (
-   "github.com/projectdiscovery/gologger"
-   updateutils "github.com/projectdiscovery/utils/update"
+	"github.com/projectdiscovery/gologger"
+	updateutils "github.com/projectdiscovery/utils/update"
 )
 
 const banner = `
@@ -26,6 +26,6 @@ func showBanner() {
 func GetUpdateCallback() func() {
 	return func() {
 		showBanner()
-		updateutils.GetUpdateToolCallback("asnmap", version)()
+		updateutils.GetToolVersionCallback("asnmap", version)()
 	}
 }
