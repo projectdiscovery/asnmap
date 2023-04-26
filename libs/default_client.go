@@ -12,5 +12,5 @@ func init() {
 }
 
 func GetData(input string) ([]*Response, error) {
-	return DefaultClient.GetData(input, "")
+	return DefaultClient.GetData(input)
 }

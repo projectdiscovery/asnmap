@@ -11,6 +11,7 @@ import (
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/hmap/store/hybrid"
 	fileutil "github.com/projectdiscovery/utils/file"
+	sliceutil "github.com/projectdiscovery/utils/slice"
 )
 
 type Runner struct {
@@ -91,20 +92,30 @@ func (r *Runner) process() error {
 				return nil
 			}
 
+			var responses []asnmap.Response
 			for _, resolvedIp := range resolvedIps {
-				ls, err := r.client.GetData(resolvedIp, item)
+				ls, err := r.client.GetDataWithCustomInput(resolvedIp, item)
 				if err != nil {
 					errProcess = err
-					return err
+					break
 				}
-				if err := r.writeOutput(ls); err != nil {
+
+				for _, l := range ls {
+					if !sliceutil.Contains(responses, *l) {
+						responses = append(responses, *l)
+					}
+				}
+			}
+
+			for _, response := range responses {
+				if err := r.writeOutput([]*asnmap.Response{&response}); err != nil {
 					errProcess = err
 					return err
 				}
 			}
 
 		default:
-			ls, err := r.client.GetData(item, "")
+			ls, err := r.client.GetData(item)
 			if err != nil {
 				errProcess = err
 				return err

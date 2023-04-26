@@ -160,7 +160,15 @@ func (c Client) makeRequest() ([]byte, error) {
 	return resBody, nil
 }
 
-func (c Client) GetData(input, domain string) ([]*Response, error) {
+func (c Client) GetDataWithCustomInput(inputToQuery, inputToUseInResponse string) ([]*Response, error) {
+	results, err := c.GetData(inputToQuery)
+	for _, result := range results {
+		result.Input = inputToUseInResponse
+	}
+	return results, err
+}
+
+func (c Client) GetData(input string, medatadas ...string) ([]*Response, error) {
 	inputToStore := input
 	switch IdentifyInput(input) {
 	case ASN:
@@ -189,12 +197,7 @@ func (c Client) GetData(input, domain string) ([]*Response, error) {
 
 	// insert original input in all responses
 	for _, result := range results {
-		// prefer domain if it was provided
-		if domain != "" {
-			result.Input = domain
-		} else {
-			result.Input = inputToStore
-		}
+		result.Input = inputToStore
 	}
 
 	return results, nil
