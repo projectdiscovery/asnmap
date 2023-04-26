@@ -26,6 +26,6 @@ func showBanner() {
 func GetUpdateCallback() func() {
 	return func() {
 		showBanner()
-		updateutils.GetToolVersionCallback("asnmap", version)()
+		updateutils.GetUpdateToolCallback("asnmap", version)()
 	}
 }
