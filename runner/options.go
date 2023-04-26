@@ -146,7 +146,7 @@ func ParseOptions() *Options {
 	showBanner()
 
 	if !options.DisableUpdateCheck {
-		latestVersion, err := updateutils.GetVersionCheckCallback("asnmap")()
+		latestVersion, err := updateutils.GetToolVersionCallback("asnmap", version)()
 		if err != nil {
 			if options.Verbose {
 				gologger.Error().Msgf("asnmap version check failed: %v", err.Error())
