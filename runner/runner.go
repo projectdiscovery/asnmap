@@ -83,8 +83,8 @@ func (r *Runner) process() error {
 		case asnmap.Domain:
 			resolvedIps, err := asnmap.ResolveDomain(item, r.options.Resolvers...)
 			if err != nil {
-				errProcess = err
-				return err
+				gologger.Verbose().Msgf("could not resolve '%s': %v", item, err)
+				return nil
 			}
 
 			if len(resolvedIps) == 0 {
