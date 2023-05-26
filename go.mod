@@ -9,7 +9,7 @@ require (
 	github.com/projectdiscovery/mapcidr v1.1.1
 	github.com/projectdiscovery/retryabledns v1.0.24
 	github.com/stretchr/testify v1.8.2
-	golang.org/x/net v0.9.0
+	golang.org/x/net v0.10.0
 )
 
 require (
