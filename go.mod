@@ -7,7 +7,7 @@ require (
 	github.com/projectdiscovery/gologger v1.1.10
 	github.com/projectdiscovery/hmap v0.0.11
 	github.com/projectdiscovery/mapcidr v1.1.2
-	github.com/projectdiscovery/retryabledns v1.0.24
+	github.com/projectdiscovery/retryabledns v1.0.26
 	github.com/stretchr/testify v1.8.3
 	golang.org/x/net v0.10.0
 )
@@ -27,7 +27,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/projectdiscovery/blackrock v0.0.1 // indirect
-	github.com/projectdiscovery/retryablehttp-go v1.0.15 // indirect
+	github.com/projectdiscovery/retryablehttp-go v1.0.16 // indirect
 	github.com/projectdiscovery/utils v0.0.32
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	go.uber.org/multierr v1.11.0 // indirect
