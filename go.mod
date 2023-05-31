@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/projectdiscovery/goflags v0.1.8
 	github.com/projectdiscovery/gologger v1.1.10
-	github.com/projectdiscovery/hmap v0.0.11
+	github.com/projectdiscovery/hmap v0.0.12
 	github.com/projectdiscovery/mapcidr v1.1.2
 	github.com/projectdiscovery/retryabledns v1.0.24
 	github.com/stretchr/testify v1.8.3
@@ -72,7 +72,7 @@ require (
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/tidwall/btree v1.6.0 // indirect
-	github.com/tidwall/buntdb v1.2.10 // indirect
+	github.com/tidwall/buntdb v1.3.0 // indirect
 	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/grect v0.1.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
