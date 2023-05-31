@@ -110,7 +110,7 @@ Example input for asnmap:
 asnmap -a AS45596 -silent
 asnmap -i 100.19.12.21 -silent
 asnmap -d hackerone.com -silent
-asnmap -o GOOGLE -silent
+asnmap -org GOOGLE -silent
 ```
 
 ### Default Run
