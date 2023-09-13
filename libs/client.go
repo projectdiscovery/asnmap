@@ -23,7 +23,7 @@ const serverURL = "https://api.asnmap.sh/"
 
 type Client struct {
 	url  *url.URL
-	http http.Client
+	http *http.Client
 }
 
 // generatefullURL creates the complete URL with path, scheme, and host
@@ -34,7 +34,7 @@ func generateFullURL(host string) (*url.URL, error) {
 	}
 
 	if !stringsutil.EqualFoldAny(rawURL.Scheme, "http", "https") {
-		return nil, errors.New("Host should start with http or https.")
+		return nil, errors.New("host should start with http or https")
 	}
 
 	rawURL.Path = "api/v1/asnmap"
@@ -63,7 +63,7 @@ func NewClient() (*Client, error) {
 
 	client := Client{
 		url:  URL,
-		http: http.Client{Transport: transCfg},
+		http: &http.Client{Transport: transCfg},
 	}
 	return &client, nil
 }
@@ -149,14 +149,24 @@ func generateRawQuery(query, value string) string {
 }
 
 func (c Client) makeRequest() ([]byte, error) {
-	req, _ := http.NewRequest(http.MethodGet, c.url.String(), nil)
+	if c.http == nil {
+		return nil, errors.New("http client is not initialized")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, c.url.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 	res, err := c.http.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
-	resBody, _ := io.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
 	return resBody, nil
 }
 
