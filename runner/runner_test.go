@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"fmt"
 	"testing"
 
 	asnmap "github.com/projectdiscovery/asnmap/libs"
@@ -21,12 +22,12 @@ func TestRunner(t *testing.T) {
 			},
 			expectedOutput: []*asnmap.Response{
 				{
-					FirstIp: "102.129.206.0",
-					LastIp:  "127.255.255.255",
+					FirstIp: "104.16.0.0",
+					LastIp:  "104.21.127.255",
 					Input:   "104.16.99.52",
-					ASN:     9498,
-					Country: "IN",
-					Org:     "BBIL-AP BHARTI Airtel Ltd."},
+					ASN:     13335,
+					Country: "US",
+					Org:     "CLOUDFLARENET"},
 			},
 		},
 		{
@@ -69,8 +70,9 @@ func TestRunner(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.name)
 			tt.options.OnResult = func(o []*asnmap.Response) {
-				require.Equal(t, o, tt.expectedOutput)
+				require.Equal(t, tt.expectedOutput, o)
 			}
 			r, err := New(tt.options)
 			require.Nil(t, err)
