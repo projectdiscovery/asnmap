@@ -5,8 +5,8 @@ go 1.18
 require (
 	github.com/projectdiscovery/goflags v0.1.20
 	github.com/projectdiscovery/gologger v1.1.11
-	github.com/projectdiscovery/hmap v0.0.18
-	github.com/projectdiscovery/mapcidr v1.1.2
+	github.com/projectdiscovery/hmap v0.0.19
+	github.com/projectdiscovery/mapcidr v1.1.9
 	github.com/projectdiscovery/retryabledns v1.0.35
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/net v0.14.0
@@ -66,7 +66,6 @@ require (
 	github.com/onsi/gomega v1.27.6 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
-	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/tidwall/btree v1.6.0 // indirect
 	github.com/tidwall/buntdb v1.3.0 // indirect
