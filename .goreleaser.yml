@@ -3,19 +3,32 @@ before:
     - go mod tidy
 
 builds:
-- binary: '{{ .ProjectName }}'
+- env:
+  - CGO_ENABLED=0
+  goos:
+    - windows
+    - linux
+    - darwin
+  goarch:
+    - amd64
+    - 386
+    - arm
+    - arm64
+
+  ignore:
+    - goos: darwin
+      goarch: '386'
+    - goos: windows
+      goarch: 'arm'
+    - goos: windows
+      goarch: 'arm64'
+
+  binary: '{{ .ProjectName }}'
   main: cmd/asnmap/asnmap.go
-
-# release options (https://goreleaser.com/customization/release/)
-
-release:
-  draft: false
-  prerelease: auto
 
 archives:
 - format: zip
-  replacements:
-      darwin: macOS
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ if eq .Os "darwin" }}macOS{{ else }}{{ .Os }}{{ end }}_{{ .Arch }}'
 
 checksum:
   algorithm: sha256
