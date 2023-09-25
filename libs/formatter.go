@@ -79,13 +79,18 @@ func prepareFormattedCSV(input *Response) ([]string, error) {
 
 func GetFormattedDataInJson(output []*Response) ([]byte, error) {
 	var jsonOutput []byte
-	for _, res := range output {
+	jsonOutput = append(jsonOutput, '[')
+	for i, res := range output {
 		json, err := prepareFormattedJSON(res)
 		if err != nil {
 			return nil, err
 		}
 		jsonOutput = append(jsonOutput, json...)
+		if i < len(output)-1 {
+			jsonOutput = append(jsonOutput, ',')
+		}
 	}
+	jsonOutput = append(jsonOutput, ']')
 	return jsonOutput, nil
 }
 
