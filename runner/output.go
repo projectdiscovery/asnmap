@@ -27,6 +27,11 @@ func (r *Runner) writeToCsv(records [][]string) error {
 	return w.Error()
 }
 
+func (r *Runner) writeToJson(record []byte) error {
+	_, err := r.options.Output.Write(record)
+	return err
+}
+
 // filterIPv6
 // - DisplayIPv6==true => returns IPv6 + IPv4
 // - DisplayIPv6==false => returns IPv4
@@ -66,8 +71,7 @@ func (r *Runner) writeOutput(output []*asnmap.Response) error {
 		if err != nil {
 			return err
 		}
-		_, err = fmt.Fprintf(r.options.Output, "%v\n", string(result))
-		return err
+		return r.writeToJson(result)
 	case r.options.DisplayInCSV:
 		results, err := asnmap.GetFormattedDataInCSV(output)
 		if err != nil {

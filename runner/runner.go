@@ -42,20 +42,21 @@ func (r *Runner) Close() error {
 func (r *Runner) Run() error {
 	if len(r.options.Proxy) > 0 {
 		if proxyURL, err := r.client.SetProxy(r.options.Proxy); err != nil {
-			return fmt.Errorf("Could not set proxy: %s", err)
+			return fmt.Errorf("could not set proxy: %s", err)
 		} else {
 			gologger.Info().Msgf("Using %s proxy %s", proxyURL.Scheme, proxyURL.String())
 		}
 	}
 
-	if r.options.DisplayInCSV {
-		if r.options.OutputFile != "" {
-			file, err := os.Create(r.options.OutputFile)
-			if err != nil {
-				return err
-			}
-			r.options.Output = file
+	if (r.options.DisplayInCSV || r.options.DisplayInJSON) && r.options.OutputFile != "" {
+		file, err := os.Create(r.options.OutputFile)
+		if err != nil {
+			return err
 		}
+		r.options.Output = file
+	}
+
+	if r.options.DisplayInCSV {
 		w := csv.NewWriter(r.options.Output)
 		w.Comma = '|'
 
