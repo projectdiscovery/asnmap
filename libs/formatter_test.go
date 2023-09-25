@@ -38,13 +38,17 @@ func TestGetFormattedDataInJson(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			output, err := GetFormattedDataInJson(tc.inputResponse)
 			require.Nil(t, err)
-			var actualOutput *Result
-			err = json.Unmarshal(output, &actualOutput)
+			var actualOutputs []*Result
+			err = json.Unmarshal(output, &actualOutputs)
 			require.Nil(t, err)
 
+			if len(actualOutputs) == 0 {
+				t.Fatalf("Expected at least one result, got none.")
+			}
+
 			// Ignoring timestamp from acutal output
-			actualOutput.Timestamp = ""
-			require.Equal(t, actualOutput, tc.expectedOutput)
+			actualOutputs[0].Timestamp = ""
+			require.Equal(t, tc.expectedOutput, actualOutputs[0])
 		})
 	}
 }
