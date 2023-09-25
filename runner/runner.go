@@ -48,7 +48,7 @@ func (r *Runner) Run() error {
 		}
 	}
 
-	if (r.options.DisplayInCSV || r.options.DisplayInJSON) && r.options.OutputFile != "" {
+	if r.options.OutputFile != "" {
 		file, err := os.Create(r.options.OutputFile)
 		if err != nil {
 			return err
