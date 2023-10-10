@@ -2,6 +2,7 @@ package runner
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"net"
 	"strings"
@@ -67,17 +68,28 @@ func (r *Runner) writeOutput(output []*asnmap.Response) error {
 	}
 	switch {
 	case r.options.DisplayInJSON:
-		result, err := asnmap.GetFormattedDataInJson(output)
+		results, err := asnmap.MapToResults(output)
 		if err != nil {
 			return err
 		}
-		return r.writeToJson(result)
+
+		resultsInJson, err := json.Marshal(results)
+		if err != nil {
+			return err
+		}
+
+		return r.writeToJson(resultsInJson)
 	case r.options.DisplayInCSV:
-		results, err := asnmap.GetFormattedDataInCSV(output)
+		results, err := asnmap.MapToResults(output)
 		if err != nil {
 			return err
 		}
-		return r.writeToCsv(results)
+		records := [][]string{}
+		for _, result := range results {
+			record := []string{result.Timestamp, result.Input, result.ASN, result.ASN_org, result.AS_country, strings.Join(result.AS_range, ",")}
+			records = append(records, record)
+		}
+		return r.writeToCsv(records)
 	default:
 		cidrs, err := asnmap.GetCIDR(output)
 		if err != nil {
