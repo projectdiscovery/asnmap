@@ -1,9 +1,11 @@
 package runner
 
 import (
+	"bytes"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"strings"
 
@@ -35,8 +37,7 @@ func (r *Runner) writeToJson(results []*asnmap.Result) error {
 			return err
 		}
 		record = append(record, '\n')
-		_, err = r.options.Output.Write(record)
-		if err != nil {
+		if _, err := io.Copy(r.options.Output, bytes.NewReader(record)); err != nil {
 			return err
 		}
 	}

@@ -58,17 +58,17 @@ func (options *Options) validateOptions() error {
 	}
 
 	if options.Asn != nil && (options.Ip != nil || options.Org != nil || options.Domain != nil) {
-		return errors.New("Asn and other options like ip, org and domain can't be used together as input to get data")
+		return errors.New("asn and other options like ip, org and domain can't be used together as input to get data")
 	} else if options.Ip != nil && (options.Asn != nil || options.Org != nil || options.Domain != nil) {
-		return errors.New("Ip and other options like asn, org and domain can't be used together as input to get data")
+		return errors.New("ip and other options like asn, org and domain can't be used together as input to get data")
 	} else if options.Org != nil && (options.Asn != nil || options.Ip != nil || options.Domain != nil) {
-		return errors.New("Org and other options like asn, ip and domain can't be used together as input to get data")
+		return errors.New("org and other options like asn, ip and domain can't be used together as input to get data")
 	} else if options.Domain != nil && (options.Asn != nil || options.Ip != nil || options.Org != nil) {
-		return errors.New("Domain and other options like asn, ip and org can't be used together as input to get data")
+		return errors.New("domain and other options like asn, ip and org can't be used together as input to get data")
 	}
 
 	if options.DisplayInJSON && options.DisplayInCSV {
-		return errors.New("Can either display in JSON or CSV.")
+		return errors.New("can either display in json or csv.")
 	}
 
 	// validate asn input

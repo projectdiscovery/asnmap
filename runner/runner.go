@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -54,6 +55,10 @@ func (r *Runner) Run() error {
 			return err
 		}
 		r.options.Output = file
+	}
+
+	if r.options.OutputFile != "" && r.options.DisplayInJSON {
+		r.options.Output = io.MultiWriter(r.options.Output, os.Stdout)
 	}
 
 	if r.options.DisplayInCSV {
