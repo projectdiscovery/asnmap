@@ -49,17 +49,20 @@ func (r *Runner) Run() error {
 		}
 	}
 
+	var outputWriters []io.Writer
 	if r.options.OutputFile != "" {
 		file, err := os.Create(r.options.OutputFile)
 		if err != nil {
 			return err
 		}
-		r.options.Output = file
+		outputWriters = append(outputWriters, file)
 	}
 
-	if r.options.OutputFile != "" && r.options.DisplayInJSON {
-		r.options.Output = io.MultiWriter(r.options.Output, os.Stdout)
+	if !r.options.DisplayInCSV {
+		outputWriters = append(outputWriters, os.Stdout)
 	}
+
+	r.options.Output = io.MultiWriter(outputWriters...)
 
 	if r.options.DisplayInCSV {
 		w := csv.NewWriter(r.options.Output)
