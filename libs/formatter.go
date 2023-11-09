@@ -22,7 +22,7 @@ type Result struct {
 type Response struct {
 	FirstIp string `json:"first_ip,omitempty"`
 	LastIp  string `json:"last_ip,omitempty"`
-	Input   string
+	Input   string `json:"-"` // added by client
 	ASN     int    `json:"asn,omitempty"`
 	Country string `json:"country,omitempty"`
 	Org     string `json:"org,omitempty"`
