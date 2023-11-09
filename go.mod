@@ -1,6 +1,6 @@
 module github.com/projectdiscovery/asnmap
 
-go 1.18
+go 1.21
 
 require (
 	github.com/projectdiscovery/goflags v0.1.26
