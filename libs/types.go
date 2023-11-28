@@ -22,12 +22,12 @@ type Result struct {
 
 // To model http response from server
 type Response struct {
-	FirstIp string
-	LastIp  string
-	Input   string
-	ASN     int
-	Country string
-	Org     string
+	FirstIp string `json:"first_ip,omitempty"`
+	LastIp  string `json:"last_ip,omitempty"`
+	Input   string `json:"-"` // added by client
+	ASN     int    `json:"asn,omitempty"`
+	Country string `json:"country,omitempty"`
+	Org     string `json:"org,omitempty"`
 }
 
 type InputType uint8
