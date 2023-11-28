@@ -27,7 +27,7 @@ func TestRunner(t *testing.T) {
 					Input:   "104.16.99.52",
 					ASN:     13335,
 					Country: "US",
-					Org:     "CLOUDFLARENET"},
+					Org:     "cloudflarenet"},
 			},
 		},
 		{
@@ -42,7 +42,7 @@ func TestRunner(t *testing.T) {
 					Input:   "14421",
 					ASN:     14421,
 					Country: "US",
-					Org:     "THERAVANCE"},
+					Org:     "theravance"},
 			},
 		},
 		{
@@ -110,7 +110,7 @@ func TestProcessForDomainInput(t *testing.T) {
 				Input:   "google.com",
 				ASN:     15169,
 				Country: "US",
-				Org:     "GOOGLE",
+				Org:     "google",
 			},
 		},
 	}
