@@ -27,7 +27,7 @@ func TestRunner(t *testing.T) {
 					Input:   "104.16.99.52",
 					ASN:     13335,
 					Country: "US",
-					Org:     "CLOUDFLARENET"},
+					Org:     "cloudflarenet"},
 			},
 		},
 		{
@@ -42,7 +42,7 @@ func TestRunner(t *testing.T) {
 					Input:   "14421",
 					ASN:     14421,
 					Country: "US",
-					Org:     "THERAVANCE"},
+					Org:     "theravance"},
 			},
 		},
 		{
@@ -141,8 +141,8 @@ func TestProcessForDomainInput(t *testing.T) {
 // compareResponse compares ASN & ORG against given domain with expected output's ASN & ORG
 // Have excluded IPs for now as they might change in future.
 func compareResponse(respA []*asnmap.Response, respB *asnmap.Response) bool {
-	for ind := range respA {
-		if respA[ind].ASN == respB.ASN && respA[ind].Org == respB.Org {
+	for _, r := range respA {
+		if r.Equal(*respB) {
 			return true
 		}
 	}
