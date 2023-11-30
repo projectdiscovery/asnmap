@@ -28,6 +28,10 @@ type Response struct {
 	Org     string `json:"org,omitempty"`
 }
 
+func (r Response) Equal(r2 Response) bool {
+	return r.ASN == r2.ASN && strings.EqualFold(r.Org, r2.Org)
+}
+
 // attachPrefix func attaches 'AS' prefix to ASN numbers
 func attachPrefix(input string) string {
 	inp := input
