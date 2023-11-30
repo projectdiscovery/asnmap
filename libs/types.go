@@ -4,6 +4,7 @@ import (
 	"net"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/asaskevich/govalidator"
@@ -28,6 +29,10 @@ type Response struct {
 	ASN     int    `json:"asn,omitempty"`
 	Country string `json:"country,omitempty"`
 	Org     string `json:"org,omitempty"`
+}
+
+func (r Response) Equal(r2 Response) bool {
+	return r.ASN == r2.ASN && strings.EqualFold(r.Org, r2.Org)
 }
 
 type InputType uint8
