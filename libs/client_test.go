@@ -140,12 +140,10 @@ func TestGetASNFromOrg(t *testing.T) {
 // compareResponse compares ASN & ORG against given domain with expected output's ASN & ORG
 // Have excluded IPs for now as they might change in future.
 func compareResponse(respA []*Response, respB *Response) bool {
-	compareResult := false
-
-	for ind := range respA {
-		if respA[ind].ASN == respB.ASN && respA[ind].Org == respB.Org {
-			compareResult = true
+	for _, r := range respA {
+		if r.Equal(*respB) {
+			return true
 		}
 	}
-	return compareResult
+	return false
 }
