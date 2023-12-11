@@ -3,7 +3,7 @@ module github.com/projectdiscovery/asnmap
 go 1.21
 
 require (
-	github.com/projectdiscovery/goflags v0.1.30
+	github.com/projectdiscovery/goflags v0.1.31
 	github.com/projectdiscovery/gologger v1.1.11
 	github.com/projectdiscovery/hmap v0.0.28
 	github.com/projectdiscovery/mapcidr v1.1.16
