@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/projectdiscovery/goflags v0.1.32
 	github.com/projectdiscovery/gologger v1.1.11
-	github.com/projectdiscovery/hmap v0.0.29
+	github.com/projectdiscovery/hmap v0.0.30
 	github.com/projectdiscovery/mapcidr v1.1.16
 	github.com/projectdiscovery/retryabledns v1.0.47
 	github.com/stretchr/testify v1.8.4
