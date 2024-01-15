@@ -27,11 +27,11 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/projectdiscovery/blackrock v0.0.1 // indirect
-	github.com/projectdiscovery/utils v0.0.72
+	github.com/projectdiscovery/utils v0.0.73
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
@@ -55,7 +55,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-github/v30 v30.1.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/klauspost/compress v1.11.4 // indirect
+	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
