@@ -1,8 +1,11 @@
 package runner
 
 import (
+	"bytes"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"strings"
 
@@ -25,6 +28,20 @@ func (r *Runner) writeToCsv(records [][]string) error {
 	w.Flush()
 
 	return w.Error()
+}
+
+func (r *Runner) writeToJson(results []*asnmap.Result) error {
+	for _, result := range results {
+		record, err := json.Marshal(result)
+		if err != nil {
+			return err
+		}
+		record = append(record, '\n')
+		if _, err := io.Copy(r.options.Output, bytes.NewReader(record)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // filterIPv6
@@ -62,18 +79,23 @@ func (r *Runner) writeOutput(output []*asnmap.Response) error {
 	}
 	switch {
 	case r.options.DisplayInJSON:
-		result, err := asnmap.GetFormattedDataInJson(output)
+		results, err := asnmap.MapToResults(output)
 		if err != nil {
 			return err
 		}
-		_, err = fmt.Fprintf(r.options.Output, "%v\n", string(result))
-		return err
+
+		return r.writeToJson(results)
 	case r.options.DisplayInCSV:
-		results, err := asnmap.GetFormattedDataInCSV(output)
+		results, err := asnmap.MapToResults(output)
 		if err != nil {
 			return err
 		}
-		return r.writeToCsv(results)
+		records := [][]string{}
+		for _, result := range results {
+			record := []string{result.Timestamp, result.Input, result.ASN, result.ASN_org, result.AS_country, strings.Join(result.AS_range, ",")}
+			records = append(records, record)
+		}
+		return r.writeToCsv(records)
 	default:
 		cidrs, err := asnmap.GetCIDR(output)
 		if err != nil {

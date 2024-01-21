@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
 
 	asnmap "github.com/projectdiscovery/asnmap/libs"
@@ -37,15 +37,21 @@ func main() {
 }
 
 func handleInput(client *asnmap.Client, item string) {
-	results, err := client.GetData(item)
+	responses, err := client.GetData(item)
 	if err != nil {
 		log.Fatal(err)
 	}
-	output, err := asnmap.GetFormattedDataInJson(results)
+	results, err := asnmap.MapToResults(responses)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	output, err := json.Marshal(results)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if len(output) > 0 {
-		log.Println(fmt.Sprintf("%s: %s", item, string(output)))
+		log.Printf("%s: %s", item, string(output))
 	}
 }

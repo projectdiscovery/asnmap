@@ -110,7 +110,7 @@ func TestProcessForDomainInput(t *testing.T) {
 				Input:   "google.com",
 				ASN:     15169,
 				Country: "US",
-				Org:     "GOOGLE",
+				Org:     "google",
 			},
 		},
 	}

@@ -32,3 +32,46 @@ func TestIdentifyInput(t *testing.T) {
 		})
 	}
 }
+
+func TestMapToResults(t *testing.T) {
+	tt := []struct {
+		name           string
+		inputResponse  []*Response
+		expectedOutput *Result
+	}{
+		{
+			name: "ASN",
+			inputResponse: []*Response{
+				{
+					FirstIp: "216.101.17.0",
+					LastIp:  "216.101.17.255",
+					Input:   "AS14421",
+					ASN:     14421,
+					Country: "US",
+					Org:     "THERAVANCE"},
+			},
+			expectedOutput: &Result{
+				Timestamp:  "",
+				Input:      "AS14421",
+				ASN:        "AS14421",
+				ASN_org:    "THERAVANCE",
+				AS_country: "US",
+				AS_range:   []string{"216.101.17.0/24"},
+			},
+		},
+	}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			output, err := MapToResults(tc.inputResponse)
+			require.Nil(t, err)
+
+			if len(output) == 0 {
+				t.Fatalf("Expected at least one result, got none.")
+			}
+
+			// Ignoring timestamp from acutal output
+			output[0].Timestamp = ""
+			require.Equal(t, tc.expectedOutput, output[0])
+		})
+	}
+}
