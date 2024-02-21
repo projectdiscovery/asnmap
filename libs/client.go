@@ -14,12 +14,27 @@ import (
 	"strings"
 	"time"
 
+	"github.com/projectdiscovery/utils/auth/pdcp"
+	"github.com/projectdiscovery/utils/env"
 	fileutil "github.com/projectdiscovery/utils/file"
 	stringsutil "github.com/projectdiscovery/utils/strings"
 	"golang.org/x/net/proxy"
 )
 
-const serverURL = "https://api.asnmap.sh/"
+const serverURL = "https://asn.projectdiscovery.io/"
+
+var ErrUnAuthorized = errors.New("unauthorized: 401 (get your free api key from https://cloud.projectdiscovery.io)")
+
+var PDCPApiKey = env.GetEnvOrDefault("PDCP_API_KEY", "")
+
+func init() {
+	if PDCPApiKey == "" {
+		pch := pdcp.PDCPCredHandler{}
+		if creds, err := pch.GetCreds(); err == nil {
+			PDCPApiKey = creds.APIKey
+		}
+	}
+}
 
 type Client struct {
 	url  *url.URL
@@ -157,11 +172,15 @@ func (c Client) makeRequest() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Set("X-PDCP-Key", PDCPApiKey)
 	res, err := c.http.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
+	if res.StatusCode == http.StatusUnauthorized {
+		return nil, ErrUnAuthorized
+	}
 
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
