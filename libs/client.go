@@ -23,9 +23,12 @@ import (
 
 const serverURL = "https://asn.projectdiscovery.io/"
 
-var ErrUnAuthorized = errors.New("unauthorized: 401 (get your free api key from https://cloud.projectdiscovery.io)")
-
-var PDCPApiKey = env.GetEnvOrDefault("PDCP_API_KEY", "")
+var (
+	UsingAsLibrary                  = false
+	RequestForAuthOnUnauthorizedErr = true
+	PDCPApiKey                      = env.GetEnvOrDefault("PDCP_API_KEY", "")
+	ErrUnAuthorized                 = errors.New("unauthorized: 401 (get your free api key from https://cloud.projectdiscovery.io)")
+)
 
 func init() {
 	if PDCPApiKey == "" {
@@ -179,6 +182,9 @@ func (c Client) makeRequest() ([]byte, error) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode == http.StatusUnauthorized {
+		if UsingAsLibrary && RequestForAuthOnUnauthorizedErr {
+			pdcp.CheckNValidateCredentials("asnmap")
+		}
 		return nil, ErrUnAuthorized
 	}
 
