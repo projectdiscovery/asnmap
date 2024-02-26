@@ -71,14 +71,14 @@ func (options *Options) validateOptions() error {
 	}
 
 	if options.DisplayInJSON && options.DisplayInCSV {
-		return errors.New("can either display in json or csv.")
+		return errors.New("can either display in json or csv")
 	}
 
 	// validate asn input
 	if options.Asn != nil {
 		for _, asn := range options.Asn {
 			if !strings.HasPrefix(strings.ToUpper(asn), "AS") {
-				return errors.New("Invalid ASN given. it should start with prefix 'AS', example : AS14421")
+				return errors.New("invalid ASN given. it should start with prefix 'AS', example : AS14421")
 			}
 		}
 	}
@@ -157,20 +157,20 @@ func ParseOptions() *Options {
 	}
 
 	if options.Version {
-		gologger.Info().Msgf("Current Version: %s\n", version)
+		gologger.Info().Msgf("Current Version: %s\n", asnmap.Version)
 		os.Exit(0)
 	}
 
 	showBanner()
 
 	if !options.DisableUpdateCheck {
-		latestVersion, err := updateutils.GetToolVersionCallback("asnmap", version)()
+		latestVersion, err := updateutils.GetToolVersionCallback("asnmap", asnmap.Version)()
 		if err != nil {
 			if options.Verbose {
 				gologger.Error().Msgf("asnmap version check failed: %v", err.Error())
 			}
 		} else {
-			gologger.Info().Msgf("Current asnmap version %v %v", version, updateutils.GetVersionDescription(version, latestVersion))
+			gologger.Info().Msgf("Current asnmap version %v %v", asnmap.Version, updateutils.GetVersionDescription(asnmap.Version, latestVersion))
 		}
 	}
 

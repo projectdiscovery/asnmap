@@ -1,6 +1,7 @@
 package runner
 
 import (
+	asnmap "github.com/projectdiscovery/asnmap/libs"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/utils/auth/pdcp"
 	updateutils "github.com/projectdiscovery/utils/update"
@@ -14,9 +15,6 @@ const banner = `
                          /_/ 
 `
 
-// version is the current version of asnmap
-const version = `v1.0.6`
-
 // showBanner is used to show the banner to the user
 func showBanner() {
 	gologger.Print().Msgf("%s\n", banner)
@@ -27,7 +25,7 @@ func showBanner() {
 func GetUpdateCallback() func() {
 	return func() {
 		showBanner()
-		updateutils.GetUpdateToolCallback("asnmap", version)()
+		updateutils.GetUpdateToolCallback("asnmap", asnmap.Version)()
 	}
 }
 

@@ -14,20 +14,21 @@ import (
 	"strings"
 	"time"
 
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/utils/auth/pdcp"
 	"github.com/projectdiscovery/utils/env"
 	fileutil "github.com/projectdiscovery/utils/file"
 	stringsutil "github.com/projectdiscovery/utils/strings"
+	updateutils "github.com/projectdiscovery/utils/update"
+	urlutil "github.com/projectdiscovery/utils/url"
 	"golang.org/x/net/proxy"
 )
 
 const serverURL = "https://asn.projectdiscovery.io/"
 
 var (
-	UsingAsLibrary                  = false
-	RequestForAuthOnUnauthorizedErr = true
-	PDCPApiKey                      = env.GetEnvOrDefault("PDCP_API_KEY", "")
-	ErrUnAuthorized                 = errors.New("unauthorized: 401 (get your free api key from https://cloud.projectdiscovery.io)")
+	PDCPApiKey      = env.GetEnvOrDefault("PDCP_API_KEY", "")
+	ErrUnAuthorized = errors.New("unauthorized: 401 (get your free api key from https://cloud.projectdiscovery.io)")
 )
 
 func init() {
@@ -162,10 +163,6 @@ func (c *Client) setProxy(proxyString string) (*url.URL, error) {
 	}
 }
 
-func generateRawQuery(query, value string) string {
-	return query + "=" + value
-}
-
 func (c Client) makeRequest() ([]byte, error) {
 	if c.http == nil {
 		return nil, errors.New("http client is not initialized")
@@ -175,6 +172,10 @@ func (c Client) makeRequest() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	if PDCPApiKey == "" {
+		gologger.Error().Label("asnmap-api").Msgf("missing or invalid api key (get your free api key from https://cloud.projectdiscovery.io)")
+		return nil, ErrUnAuthorized
+	}
 	req.Header.Set("X-PDCP-Key", PDCPApiKey)
 	res, err := c.http.Do(req)
 	if err != nil {
@@ -182,9 +183,7 @@ func (c Client) makeRequest() ([]byte, error) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode == http.StatusUnauthorized {
-		if UsingAsLibrary && RequestForAuthOnUnauthorizedErr {
-			pdcp.CheckNValidateCredentials("asnmap")
-		}
+		gologger.Error().Msgf("missing or invalid api key (get your free api key from https://cloud.projectdiscovery.io)")
 		return nil, ErrUnAuthorized
 	}
 
@@ -205,19 +204,24 @@ func (c Client) GetDataWithCustomInput(inputToQuery, inputToUseInResponse string
 
 func (c Client) GetData(input string, medatadas ...string) ([]*Response, error) {
 	inputToStore := input
+	params := urlutil.NewOrderedParams()
 	switch IdentifyInput(input) {
 	case ASN:
 		inputToStore = strings.TrimPrefix(strings.ToLower(input), "as")
-		c.url.RawQuery = generateRawQuery("asn", inputToStore)
+		params.Add("asn", inputToStore)
 	case ASNID:
-		c.url.RawQuery = generateRawQuery("asn", input)
+		params.Add("asn", input)
 	case IP:
-		c.url.RawQuery = generateRawQuery("ip", input)
+		params.Add("ip", input)
 	case Org:
-		c.url.RawQuery = generateRawQuery("org", input)
+		params.Add("org", input)
 	case Unknown:
 		return nil, errors.New("unknown type")
 	}
+
+	params.Decode(updateutils.GetpdtmParams(Version))
+
+	c.url.RawQuery = params.Encode()
 
 	resp, err := c.makeRequest()
 	if err != nil {
