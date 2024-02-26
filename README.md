@@ -41,7 +41,7 @@
 
 ## Installation
 
-asnmap requires **Go 1.18** to install successfully. To install, just run the below command or download pre-compiled binary from [release page](https://github.com/projectdiscovery/asnmap/releases).
+asnmap requires **Go 1.21** to install successfully. To install, just run the below command or download pre-compiled binary from [release page](https://github.com/projectdiscovery/asnmap/releases).
 
 ```console
 go install github.com/projectdiscovery/asnmap/cmd/asnmap@latest
@@ -85,9 +85,36 @@ OUTPUT:
    -version            show version of the project
 ```
 
-## Running asnmap
+## Configuring ASNMap CLI
 
-### Input for asnmap
+ASNMap CLI is built on top of the ASNMap API that requires API Token from [ProjectDiscovery Cloud Platform](https://cloud.projectdiscovery.io/?ref=api_key) that can be configured using environment variable or using interactive `-auth` option as shown below.
+
+### Using environment variable
+
+```console
+export PDCP_API_KEY=*************
+```
+
+### Using auth option
+
+```console
+asnmap -auth
+
+
+   ___   _____  __              
+  / _ | / __/ |/ /_ _  ___ ____ 
+ / __ |_\ \/    /  ' \/ _  / _ \
+/_/ |_/___/_/|_/_/_/_/\_,_/ .__/
+                         /_/ 
+
+    projectdiscovery.io
+
+[INF] Get your free api key by signing up at https://cloud.projectdiscovery.io
+[*] Enter PDCP API Key (exit to abort): *************
+[INF] Successfully logged in as (@user)
+```
+
+## Running asnmap
 
 **asnmap** support multiple inputs including **ASN**, **IP**, **DNS** and **ORG** name to query ASN/CIDR information.
 
