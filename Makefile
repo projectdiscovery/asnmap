@@ -3,12 +3,19 @@ GOCMD=go
 GOBUILD=$(GOCMD) build
 GOMOD=$(GOCMD) mod
 GOTEST=$(GOCMD) test
-GOCLEAN=$(GOCMD) clean
+GOFLAGS := -v
+# This should be disabled if the binary uses pprof
+LDFLAGS := -s -w
+
+ifneq ($(shell go env GOOS),darwin)
+LDFLAGS := -extldflags "-static"
+endif
+    
 
 .PHONY: cli test tidy
 
-cli:
-	$(GOBUILD) -v -ldflags="-extldflags=-static" -o "asnmap" ./cmd/asnmap/
+cli, build:
+	$(GOBUILD) $(GOFLAGS) -ldflags '$(LDFLAGS)' -o "asnmap" ./cmd/asnmap/
 test:
 	$(GOCLEAN) -testcache
 	$(GOTEST) -v ./...

@@ -10,6 +10,8 @@ import (
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/levels"
+	"github.com/projectdiscovery/utils/auth/pdcp"
+	"github.com/projectdiscovery/utils/env"
 	fileutil "github.com/projectdiscovery/utils/file"
 	updateutils "github.com/projectdiscovery/utils/update"
 )
@@ -27,6 +29,7 @@ type Options struct {
 	Org                goflags.StringSlice
 	Proxy              goflags.StringSlice
 	OutputFile         string
+	PdcpAuth           string
 	Output             io.Writer
 	DisplayInJSON      bool
 	DisplayInCSV       bool
@@ -68,14 +71,14 @@ func (options *Options) validateOptions() error {
 	}
 
 	if options.DisplayInJSON && options.DisplayInCSV {
-		return errors.New("can either display in json or csv.")
+		return errors.New("can either display in json or csv")
 	}
 
 	// validate asn input
 	if options.Asn != nil {
 		for _, asn := range options.Asn {
 			if !strings.HasPrefix(strings.ToUpper(asn), "AS") {
-				return errors.New("Invalid ASN given. it should start with prefix 'AS', example : AS14421")
+				return errors.New("invalid ASN given. it should start with prefix 'AS', example : AS14421")
 			}
 		}
 	}
@@ -99,6 +102,7 @@ func ParseOptions() *Options {
 
 	// Configs
 	flagSet.CreateGroup("configs", "Configurations",
+		flagSet.DynamicVar(&options.PdcpAuth, "auth", "true", "configure projectdiscovery cloud (pdcp) api key"),
 		flagSet.StringVar(&cfgFile, "config", "", "path to the asnmap configuration file"),
 		flagSet.StringSliceVarP(&options.Resolvers, "resolvers", "r", nil, "list of resolvers to use", goflags.FileCommaSeparatedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Proxy, "proxy", "p", nil, "list of proxy to use (comma separated or file input)", goflags.FileCommaSeparatedStringSliceOptions),
@@ -125,6 +129,20 @@ func ParseOptions() *Options {
 		gologger.Fatal().Msgf("%s\n", err)
 	}
 
+	// api key hierarchy: cli flag > env var > .pdcp/credential file
+	if options.PdcpAuth == "true" {
+		AuthWithPDCP()
+	} else if len(options.PdcpAuth) == 36 {
+		asnmap.PDCPApiKey = options.PdcpAuth
+		ph := pdcp.PDCPCredHandler{}
+		if _, err := ph.GetCreds(); err == pdcp.ErrNoCreds {
+			apiServer := env.GetEnvOrDefault("PDCP_API_SERVER", pdcp.DefaultApiServer)
+			if validatedCreds, err := ph.ValidateAPIKey(asnmap.PDCPApiKey, apiServer, "asnmap"); err == nil {
+				_ = ph.SaveCreds(validatedCreds)
+			}
+		}
+	}
+
 	// Read the inputs and configure the logging
 	options.configureOutput()
 
@@ -139,20 +157,20 @@ func ParseOptions() *Options {
 	}
 
 	if options.Version {
-		gologger.Info().Msgf("Current Version: %s\n", version)
+		gologger.Info().Msgf("Current Version: %s\n", asnmap.Version)
 		os.Exit(0)
 	}
 
 	showBanner()
 
 	if !options.DisableUpdateCheck {
-		latestVersion, err := updateutils.GetToolVersionCallback("asnmap", version)()
+		latestVersion, err := updateutils.GetToolVersionCallback("asnmap", asnmap.Version)()
 		if err != nil {
 			if options.Verbose {
 				gologger.Error().Msgf("asnmap version check failed: %v", err.Error())
 			}
 		} else {
-			gologger.Info().Msgf("Current asnmap version %v %v", version, updateutils.GetVersionDescription(version, latestVersion))
+			gologger.Info().Msgf("Current asnmap version %v %v", asnmap.Version, updateutils.GetVersionDescription(asnmap.Version, latestVersion))
 		}
 	}
 

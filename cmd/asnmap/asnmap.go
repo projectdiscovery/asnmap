@@ -1,11 +1,14 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"os/signal"
 
+	asnmap "github.com/projectdiscovery/asnmap/libs"
 	"github.com/projectdiscovery/asnmap/runner"
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/utils/auth/pdcp"
 )
 
 func main() {
@@ -34,6 +37,15 @@ func main() {
 	}()
 
 	if err := asnmapRunner.Run(); err != nil {
+		if errors.Is(err, asnmap.ErrUnAuthorized) {
+			gologger.Info().Msgf("Try again after authenticating with PDCP\n\n")
+			// trigger auth callback
+			pdcp.CheckNValidateCredentials("asnmap")
+			// run again
+			if err := asnmapRunner.Run(); err != nil {
+				gologger.Fatal().Msgf("%s\n", err)
+			}
+		}
 		gologger.Fatal().Msgf("%s\n", err)
 	}
 }
