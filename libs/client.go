@@ -173,7 +173,7 @@ func (c Client) makeRequest() ([]byte, error) {
 		return nil, err
 	}
 	if PDCPApiKey == "" {
-		gologger.Error().Label("asnmap-api").Msgf("missing or invalid api key (get your free api key from https://cloud.projectdiscovery.io)")
+		gologger.Error().Label("asnmap-api").Msgf("missing or invalid api key (get free api & configure it from https://cloud.projectdiscovery.io/?ref=api_key)")
 		return nil, ErrUnAuthorized
 	}
 	req.Header.Set("X-PDCP-Key", PDCPApiKey)
@@ -183,7 +183,7 @@ func (c Client) makeRequest() ([]byte, error) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode == http.StatusUnauthorized {
-		gologger.Error().Msgf("missing or invalid api key (get your free api key from https://cloud.projectdiscovery.io)")
+		gologger.Error().Msgf("missing or invalid api key (get free api & configure it from https://cloud.projectdiscovery.io/?ref=api_key)")
 		return nil, ErrUnAuthorized
 	}
 
