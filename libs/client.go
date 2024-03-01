@@ -28,7 +28,7 @@ const serverURL = "https://asn.projectdiscovery.io/"
 
 var (
 	PDCPApiKey      = env.GetEnvOrDefault("PDCP_API_KEY", "")
-	ErrUnAuthorized = errors.New("unauthorized: 401 (get your free api key from https://cloud.projectdiscovery.io)")
+	ErrUnAuthorized = errors.New("unauthorized: 401 (get free api key to configure from https://cloud.projectdiscovery.io/?ref=api_key)")
 )
 
 func init() {
