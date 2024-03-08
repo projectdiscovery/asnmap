@@ -102,7 +102,7 @@ func ParseOptions() *Options {
 
 	// Configs
 	flagSet.CreateGroup("configs", "Configurations",
-		flagSet.DynamicVar(&options.PdcpAuth, "auth", "true", "configure projectdiscovery cloud (pdcp) api key"),
+		flagSet.DynamicVar(&options.PdcpAuth, "auth", "true", "configure ProjectDiscovery Cloud Platform (PDCP) api key"),
 		flagSet.StringVar(&cfgFile, "config", "", "path to the asnmap configuration file"),
 		flagSet.StringSliceVarP(&options.Resolvers, "resolvers", "r", nil, "list of resolvers to use", goflags.FileCommaSeparatedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Proxy, "proxy", "p", nil, "list of proxy to use (comma separated or file input)", goflags.FileCommaSeparatedStringSliceOptions),
