@@ -58,10 +58,7 @@ func (r *Runner) Run() error {
 		outputWriters = append(outputWriters, file)
 	}
 
-	if !r.options.DisplayInCSV {
-		outputWriters = append(outputWriters, os.Stdout)
-	}
-
+	outputWriters = append(outputWriters, os.Stdout)
 	r.options.Output = io.MultiWriter(outputWriters...)
 
 	if r.options.DisplayInCSV {
