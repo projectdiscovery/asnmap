@@ -46,7 +46,7 @@ const (
 	Unknown
 )
 
-var domainRegex = regexp.MustCompile(`^(?i)[a-z0-9-]+(\.[a-z0-9-]+)+\.?$`)
+var domainRegex = regexp.MustCompile(`^(?i)[a-z0-9-_]+(\.[a-z0-9-]+)+\.?$`)
 
 func MapToResults(output []*Response) ([]*Result, error) {
 	results := make([]*Result, 0, len(output))
