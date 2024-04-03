@@ -2,6 +2,7 @@ package asnmap
 
 import (
 	"net"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -44,6 +45,8 @@ const (
 	Domain
 	Unknown
 )
+
+var domainRegex = regexp.MustCompile(`^(?i)[a-z0-9-_]+(\.[a-z0-9-]+)+\.?$`)
 
 func MapToResults(output []*Response) ([]*Result, error) {
 	results := make([]*Result, 0, len(output))
@@ -118,7 +121,7 @@ func IdentifyInput(input string) InputType {
 		return ASN
 	case checkIfASNId(input):
 		return ASNID
-	case govalidator.IsDNSName(input):
+	case domainRegex.MatchString(input):
 		return Domain
 	default:
 		return Org
