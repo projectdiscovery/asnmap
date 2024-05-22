@@ -187,7 +187,7 @@ func (c Client) makeRequest() ([]byte, error) {
 		return nil, ErrUnAuthorized
 	}
 
-	if res.StatusCode != http.StatusBadRequest {
+	if res.StatusCode == http.StatusBadRequest {
 		body, _ := io.ReadAll(res.Body)
 		bodyStr := string(body)
 		errMsg := fmt.Sprintf("bad request: %s", bodyStr)
