@@ -28,7 +28,7 @@ const serverURL = "https://asn.projectdiscovery.io/"
 
 var (
 	PDCPApiKey      = env.GetEnvOrDefault("PDCP_API_KEY", "")
-	ErrUnAuthorized = errors.New("unauthorized: 401 (get your free api key from https://cloud.projectdiscovery.io)")
+	ErrUnAuthorized = errors.New("unauthorized: 401 (get free api key to configure from https://cloud.projectdiscovery.io/?ref=api_key)")
 )
 
 func init() {
@@ -173,7 +173,7 @@ func (c Client) makeRequest() ([]byte, error) {
 		return nil, err
 	}
 	if PDCPApiKey == "" {
-		gologger.Error().Label("asnmap-api").Msgf("missing or invalid api key (get free api & configure it from https://cloud.projectdiscovery.io/?ref=api_key)")
+		gologger.Error().Label("asnmap-api").Msgf("missing or invalid api key (get free api key & configure it from https://cloud.projectdiscovery.io/?ref=api_key)")
 		return nil, ErrUnAuthorized
 	}
 	req.Header.Set("X-PDCP-Key", PDCPApiKey)
@@ -183,8 +183,17 @@ func (c Client) makeRequest() ([]byte, error) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode == http.StatusUnauthorized {
-		gologger.Error().Msgf("missing or invalid api key (get free api & configure it from https://cloud.projectdiscovery.io/?ref=api_key)")
+		gologger.Error().Msgf("missing or invalid api key (get free api key & configure it from https://cloud.projectdiscovery.io/?ref=api_key)")
 		return nil, ErrUnAuthorized
+	}
+
+	if res.StatusCode == http.StatusBadRequest {
+		body, _ := io.ReadAll(res.Body)
+		bodyStr := string(body)
+		errMsg := fmt.Sprintf("bad request: %s", bodyStr)
+
+		gologger.Error().Msg(errMsg)
+		return nil, errors.New(errMsg)
 	}
 
 	resBody, err := io.ReadAll(res.Body)

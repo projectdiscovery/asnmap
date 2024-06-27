@@ -56,7 +56,7 @@ func (options *Options) validateOptions() error {
 		return errors.New("verbose and silent can't be used together")
 	}
 
-	if options.Asn == nil && options.Ip == nil && options.Org == nil && options.Domain == nil && !fileutil.HasStdin() && cfgFile == "" {
+	if options.Asn == nil && options.Ip == nil && options.Org == nil && options.Domain == nil && !fileutil.HasStdin() && cfgFile == "" && options.FileInput == nil {
 		return errors.New("no input defined")
 	}
 
@@ -97,7 +97,7 @@ func ParseOptions() *Options {
 		flagSet.StringSliceVarP(&options.Ip, "ip", "i", nil, "target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40:: ", goflags.FileNormalizedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Domain, "domain", "d", nil, "target domain to lookup, example: -d google.com, -d facebook.com", goflags.FileNormalizedStringSliceOptions),
 		flagSet.StringSliceVar(&options.Org, "org", nil, "target organization to lookup, example: -org GOOGLE", goflags.StringSliceOptions),
-		flagSet.StringSliceVarP(&options.FileInput, "file", "f", nil, "targets to lookup from file", goflags.CommaSeparatedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.FileInput, "file", "f", nil, "targets to lookup from file", goflags.FileCommaSeparatedStringSliceOptions),
 	)
 
 	// Configs

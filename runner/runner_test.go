@@ -23,7 +23,7 @@ func TestRunner(t *testing.T) {
 			expectedOutput: []*asnmap.Response{
 				{
 					FirstIp: "104.16.0.0",
-					LastIp:  "104.21.127.255",
+					LastIp:  "104.22.79.255",
 					Input:   "104.16.99.52",
 					ASN:     13335,
 					Country: "US",
