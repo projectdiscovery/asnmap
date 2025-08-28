@@ -10,89 +10,80 @@ func TestGetASNFromIP(t *testing.T) {
 	client, err := NewClient()
 	require.Nil(t, err)
 
-	tt := []struct {
-		name   string
-		ip     string
-		result []*Response
-	}{
-		{"found", "100.19.12.21", []*Response{{FirstIp: "", LastIp: "", Input: "100.19.12.21", ASN: 701, Country: "US", Org: "uunet"}}},
-		{"not found", "255.100.100.100", []*Response{}},
-	}
+	t.Run("found", func(t *testing.T) {
+		ip := "100.19.12.21"
+		expectedResult := []*Response{{FirstIp: "", LastIp: "", Input: "100.19.12.21", ASN: 701, Country: "US", Org: "uunet"}}
+		i, err := client.GetData(ip)
+		require.Nil(t, err)
+		for _, result := range expectedResult {
+			x := compareResponse(i, result)
+			require.True(t, x)
+		}
+	})
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			i, err := client.GetData(tc.ip)
-			require.Nil(t, err)
-			// // Expecting true from comparision
-			for _, result := range tc.result {
-				x := compareResponse(i, result)
-				require.True(t, x)
-			}
-		})
-	}
+	t.Run("not found", func(t *testing.T) {
+		ip := "255.100.100.100"
+		expectedErrMsg := "bad request: {\"error\":\"no results found\"}"
+		_, err := client.GetData(ip)
+		require.NotNil(t, err)
+		require.EqualError(t, err, expectedErrMsg)
+	})
 }
 
 func TestGetIPFromASN(t *testing.T) {
 	client, err := NewClient()
 	require.Nil(t, err)
 
-	tt := []struct {
-		name   string
-		asn    string
-		result []*Response
-	}{
-		{
-			"zero match", "1123", []*Response{},
-		},
-		{
-			"single match", "14421", []*Response{{
-				FirstIp: "216.101.17.0",
-				LastIp:  "216.101.17.255",
-				Input:   "14421",
-				ASN:     14421,
-				Country: "US",
-				Org:     "theravance",
-			}},
-		},
-		{
-			"multi match", "7712", []*Response{
-				{
-					FirstIp: "118.67.200.0",
-					LastIp:  "118.67.202.255",
-					Input:   "7712",
-					ASN:     7712,
-					Country: "KH",
-					Org:     "sabay sabay digital cambodia",
-				},
-				{
-					FirstIp: "118.67.203.0",
-					LastIp:  "118.67.207.255",
-					Input:   "7712",
-					ASN:     7712,
-					Country: "KH",
-					Org:     "sabay sabay digital cambodia",
-				},
-				{
-					FirstIp: "2405:aa00::",
-					LastIp:  "2405:aa00:ffff:ffff:ffff:ffff:ffff:ffff",
-					Input:   "7712",
-					ASN:     7712,
-					Country: "KH",
-					Org:     "sabay sabay digital cambodia",
-				}},
-		},
-	}
+	t.Run("zero match", func(t *testing.T) {
+		expectedErrMsg := "bad request: {\"error\":\"no results found\"}"
+		_, err := client.GetData("1123")
+		require.NotNil(t, err)
+		require.EqualError(t, err, expectedErrMsg)
+	})
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			i, err := client.GetData(tc.asn)
-			require.Nil(t, err)
-			for _, result := range tc.result {
-				x := compareResponse(i, result)
-				require.True(t, x)
-			}
-		})
-	}
+	t.Run("single match", func(t *testing.T) {
+		result := []*Response{{
+			FirstIp: "216.101.17.0",
+			LastIp:  "216.101.17.255",
+			Input:   "14421",
+			ASN:     14421,
+			Country: "US",
+			Org:     "theravance",
+		}}
+		i, err := client.GetData("14421")
+		require.Nil(t, err)
+		for _, expected := range result {
+			x := compareResponse(i, expected)
+			require.True(t, x)
+		}
+	})
+
+	t.Run("multi match", func(t *testing.T) {
+		result := []*Response{
+			{
+				FirstIp: "118.67.200.0",
+				LastIp:  "118.67.203.255",
+				Input:   "7712",
+				ASN:     7712,
+				Country: "KH",
+				Org:     "cne-as-ap cambodian network exchange co., ltd.",
+			},
+			{
+				FirstIp: "118.67.200.0",
+				LastIp:  "118.67.207.255",
+				Input:   "7712",
+				ASN:     7712,
+				Country: "KH",
+				Org:     "cne-as-ap cambodian network exchange co., ltd.",
+			},
+		}
+		i, err := client.GetData("7712")
+		require.Nil(t, err)
+		for _, expected := range result {
+			x := compareResponse(i, expected)
+			require.True(t, x)
+		}
+	})
 }
 
 func TestGetASNFromOrg(t *testing.T) {

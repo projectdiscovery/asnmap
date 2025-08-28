@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"fmt"
 	"testing"
 
 	asnmap "github.com/projectdiscovery/asnmap/libs"
@@ -23,7 +22,7 @@ func TestRunner(t *testing.T) {
 			expectedOutput: []*asnmap.Response{
 				{
 					FirstIp: "104.16.0.0",
-					LastIp:  "104.22.79.255",
+					LastIp:  "104.20.63.255",
 					Input:   "104.16.99.52",
 					ASN:     13335,
 					Country: "US",
@@ -48,29 +47,37 @@ func TestRunner(t *testing.T) {
 		{
 			name: "Org",
 			options: &Options{
-				Org: []string{"PPLINK"},
+				Org: []string{"microsoft"},
 			},
 			expectedOutput: []*asnmap.Response{
 				{
-					FirstIp: "45.239.52.0",
-					LastIp:  "45.239.55.255",
-					Input:   "PPLINK",
-					ASN:     268353,
-					Country: "BR",
-					Org:     "PPLINKNET SERVICOS DE COMUNICACAO LTDA - ME"},
+					FirstIp: "151.207.40.0",
+					LastIp:  "151.207.47.255",
+					Input:   "microsoft",
+					ASN:     12076,
+					Country: "US",
+					Org:     "microsoft"},
 				{
-					FirstIp: "2804:4fd8::",
-					LastIp:  "2804:4fd8:ffff:ffff:ffff:ffff:ffff:ffff",
-					Input:   "PPLINK",
-					ASN:     268353,
-					Country: "BR",
-					Org:     "PPLINKNET SERVICOS DE COMUNICACAO LTDA - ME"},
+					FirstIp: "170.110.229.0",
+					LastIp:  "170.110.229.255",
+					Input:   "microsoft",
+					ASN:     12076,
+					Country: "US",
+					Org:     "microsoft",
+				},
+				{
+					FirstIp: "2608:1c1:6::",
+					LastIp:  "2608:1c1:8:ffff:ffff:ffff:ffff:ffff",
+					Input:   "microsoft",
+					ASN:     12076,
+					Country: "US",
+					Org:     "microsoft",
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fmt.Println(tt.name)
 			tt.options.OnResult = func(o []*asnmap.Response) {
 				require.Equal(t, tt.expectedOutput, o)
 			}
