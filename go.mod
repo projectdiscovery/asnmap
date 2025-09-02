@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/projectdiscovery/goflags v0.1.59
 	github.com/projectdiscovery/gologger v1.1.54
-	github.com/projectdiscovery/hmap v0.0.92
+	github.com/projectdiscovery/hmap v0.0.93
 	github.com/projectdiscovery/mapcidr v1.1.34
 	github.com/projectdiscovery/retryabledns v1.0.106
 	github.com/stretchr/testify v1.10.0
