@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/projectdiscovery/goflags v0.1.59
 	github.com/projectdiscovery/gologger v1.1.54
-	github.com/projectdiscovery/hmap v0.0.92
+	github.com/projectdiscovery/hmap v0.0.93
 	github.com/projectdiscovery/mapcidr v1.1.34
 	github.com/projectdiscovery/retryabledns v1.0.106
 	github.com/stretchr/testify v1.10.0
@@ -88,7 +88,7 @@ require (
 	github.com/projectdiscovery/fastdialer v0.4.7 // indirect
 	github.com/projectdiscovery/machineid v0.0.0-20240226150047-2e2c51e35983 // indirect
 	github.com/projectdiscovery/networkpolicy v0.1.22 // indirect
-	github.com/projectdiscovery/retryablehttp-go v1.0.121 // indirect
+	github.com/projectdiscovery/retryablehttp-go v1.0.122 // indirect
 	github.com/refraction-networking/utls v1.7.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/shirou/gopsutil/v3 v3.23.7 // indirect
