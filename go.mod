@@ -3,10 +3,10 @@ module github.com/projectdiscovery/asnmap
 go 1.24.0
 
 require (
-	github.com/projectdiscovery/goflags v0.1.59
+	github.com/projectdiscovery/goflags v0.1.74
 	github.com/projectdiscovery/gologger v1.1.57
 	github.com/projectdiscovery/hmap v0.0.95
-	github.com/projectdiscovery/mapcidr v1.1.34
+	github.com/projectdiscovery/mapcidr v1.1.95
 	github.com/projectdiscovery/retryabledns v1.0.107
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.39.0
