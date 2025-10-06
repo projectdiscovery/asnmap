@@ -243,8 +243,8 @@ github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c h1:ncq/mPwQF
 github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c/go.mod h1:OmDBASR4679mdNQnz2pUhc2G8CO2JrUAVFDRBDP/hJE=
 github.com/projectdiscovery/blackrock v0.0.1 h1:lHQqhaaEFjgf5WkuItbpeCZv2DUIE45k0VbGJyft6LQ=
 github.com/projectdiscovery/blackrock v0.0.1/go.mod h1:ANUtjDfaVrqB453bzToU+YB4cUbvBRpLvEwoWIwlTss=
-github.com/projectdiscovery/fastdialer v0.4.11 h1:6JYoORInQiENFPTqGMI+1GaL5hOTD/sjWrSbzM8d+Z0=
-github.com/projectdiscovery/fastdialer v0.4.11/go.mod h1:i2dB26BHw0BMrx7ccbHcb/1LE5q9gy0ojvBytATl38E=
+github.com/projectdiscovery/fastdialer v0.4.12 h1:5lHnx1SK8HRF4xoxlbRMytd3r0jwvw6aObPj9xw+Q5s=
+github.com/projectdiscovery/fastdialer v0.4.12/go.mod h1:SFhDHNw7VjSoefZfJeR4vqmhKOExPSGPZud2TeeUG50=
 github.com/projectdiscovery/goflags v0.1.59 h1:rFScpC57L0Ln0dJmBtstyxHUH7K9H4UmHACXcSkdqqk=
 github.com/projectdiscovery/goflags v0.1.59/go.mod h1:dj67QGp/D81WRLtzU0HsWR20zgoGZ0cnk3Wbt9xJcuo=
 github.com/projectdiscovery/gologger v1.1.56 h1:XZCJs534F0pTaHToQWtqCrAzUJwaF572qLzrSn5adOA=
