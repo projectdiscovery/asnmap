@@ -7,7 +7,7 @@ require (
 	github.com/projectdiscovery/gologger v1.1.57
 	github.com/projectdiscovery/hmap v0.0.95
 	github.com/projectdiscovery/mapcidr v1.1.95
-	github.com/projectdiscovery/retryabledns v1.0.107
+	github.com/projectdiscovery/retryabledns v1.0.108
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.39.0
 )
