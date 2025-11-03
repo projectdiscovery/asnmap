@@ -6,7 +6,7 @@ require (
 	github.com/projectdiscovery/goflags v0.1.74
 	github.com/projectdiscovery/gologger v1.1.59
 	github.com/projectdiscovery/hmap v0.0.95
-	github.com/projectdiscovery/mapcidr v1.1.96
+	github.com/projectdiscovery/mapcidr v1.1.97
 	github.com/projectdiscovery/retryabledns v1.0.108
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.39.0
