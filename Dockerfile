@@ -1,5 +1,5 @@
 # Base
-FROM golang:1.25.4-alpine AS builder
+FROM golang:1.25.5-alpine AS builder
 
 RUN apk add --no-cache git build-base gcc musl-dev
 WORKDIR /app
