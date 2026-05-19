@@ -9,69 +9,56 @@ import (
 )
 
 func TestRunner(t *testing.T) {
+	// CIDR ranges and the exact set of records returned by the
+	// upstream ASN service change over time. Pin only the stable
+	// fields (ASN, Org, Country, Input) so the suite isn't broken
+	// every time the database is updated.
 	tests := []struct {
-		name           string
-		options        *Options
-		expectedOutput []*asnmap.Response
+		name    string
+		options *Options
+		assert  func(t *testing.T, got []*asnmap.Response)
 	}{
 		{
-			name: "IP",
-			options: &Options{
-				Ip: []string{"104.16.99.52"},
-			},
-			expectedOutput: []*asnmap.Response{
-				{
-					FirstIp: "104.16.0.0",
-					LastIp:  "104.20.63.255",
-					Input:   "104.16.99.52",
-					ASN:     13335,
-					Country: "US",
-					Org:     "cloudflarenet"},
+			name:    "IP",
+			options: &Options{Ip: []string{"104.16.99.52"}},
+			assert: func(t *testing.T, got []*asnmap.Response) {
+				require.NotEmpty(t, got)
+				for _, r := range got {
+					require.Equal(t, 13335, r.ASN)
+					require.Equal(t, "cloudflarenet", r.Org)
+					require.Equal(t, "US", r.Country)
+					require.Equal(t, "104.16.99.52", r.Input)
+				}
 			},
 		},
 		{
-			name: "ASN",
-			options: &Options{
-				Asn: []string{"AS14421"},
-			},
-			expectedOutput: []*asnmap.Response{
-				{
-					FirstIp: "216.101.17.0",
-					LastIp:  "216.101.17.255",
-					Input:   "14421",
-					ASN:     14421,
-					Country: "US",
-					Org:     "theravance"},
+			name:    "ASN",
+			options: &Options{Asn: []string{"AS14421"}},
+			assert: func(t *testing.T, got []*asnmap.Response) {
+				require.NotEmpty(t, got)
+				for _, r := range got {
+					require.Equal(t, 14421, r.ASN)
+					require.Equal(t, "14421", r.Input)
+				}
 			},
 		},
 		{
-			name: "Org",
-			options: &Options{
-				Org: []string{"microsoft"},
-			},
-			expectedOutput: []*asnmap.Response{
-				{
-					FirstIp: "151.207.40.0",
-					LastIp:  "151.207.47.255",
-					Input:   "microsoft",
-					ASN:     12076,
-					Country: "US",
-					Org:     "microsoft"},
-				{
-					FirstIp: "170.110.229.0",
-					LastIp:  "170.110.229.255",
-					Input:   "microsoft",
-					ASN:     12076,
-					Country: "US",
-					Org:     "microsoft",
-				},
+			name:    "Org",
+			options: &Options{Org: []string{"microsoft"}},
+			assert: func(t *testing.T, got []*asnmap.Response) {
+				require.NotEmpty(t, got)
+				for _, r := range got {
+					require.Equal(t, 12076, r.ASN)
+					require.Equal(t, "microsoft", r.Org)
+					require.Equal(t, "microsoft", r.Input)
+				}
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.options.OnResult = func(o []*asnmap.Response) {
-				require.Equal(t, tt.expectedOutput, o)
+				tt.assert(t, o)
 			}
 			r, err := New(tt.options)
 			require.Nil(t, err)
