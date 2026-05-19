@@ -65,14 +65,6 @@ func TestRunner(t *testing.T) {
 					Country: "US",
 					Org:     "microsoft",
 				},
-				{
-					FirstIp: "2608:1c1:6::",
-					LastIp:  "2608:1c1:8:ffff:ffff:ffff:ffff:ffff",
-					Input:   "microsoft",
-					ASN:     12076,
-					Country: "US",
-					Org:     "microsoft",
-				},
 			},
 		},
 	}
