@@ -88,8 +88,8 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/projectdiscovery/fastdialer v0.5.7 // indirect
 	github.com/projectdiscovery/machineid v0.0.0-20250715113114-c77eb3567582 // indirect
-	github.com/projectdiscovery/networkpolicy v0.1.37 // indirect
-	github.com/projectdiscovery/retryablehttp-go v1.3.11 // indirect
+	github.com/projectdiscovery/networkpolicy v0.1.38 // indirect
+	github.com/projectdiscovery/retryablehttp-go v1.3.12 // indirect
 	github.com/refraction-networking/utls v1.8.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/shirou/gopsutil/v4 v4.26.3 // indirect
