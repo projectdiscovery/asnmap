@@ -113,7 +113,7 @@ func (c *Client) setProxyFromFile(fileName string) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		proxy := strings.TrimSpace(scanner.Text())
@@ -181,7 +181,7 @@ func (c Client) makeRequest() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	if res.StatusCode == http.StatusUnauthorized {
 		gologger.Error().Msgf("missing or invalid api key (get free api key & configure it from https://cloud.projectdiscovery.io/?ref=api_key)")
 		return nil, ErrUnAuthorized
