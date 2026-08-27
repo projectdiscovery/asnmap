@@ -154,8 +154,12 @@ func (c *Client) setProxy(proxyString string) (*url.URL, error) {
 		if err != nil {
 			return nil, err
 		}
+		contextDialer, ok := dialer.(proxy.ContextDialer)
+		if !ok {
+			return nil, errors.New("socks5 dialer does not support DialContext")
+		}
 		c.http.Transport = &http.Transport{
-			Dial: dialer.Dial,
+			DialContext: contextDialer.DialContext,
 		}
 		return proxyurl, nil
 	default:
