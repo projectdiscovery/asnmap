@@ -1,4 +1,4 @@
-FROM alpine:3.24.1
+FROM alpine:latest
 
 LABEL org.opencontainers.image.authors="ProjectDiscovery"
 LABEL org.opencontainers.image.description="Go CLI and Library for quickly mapping organization network ranges using ASN information."
