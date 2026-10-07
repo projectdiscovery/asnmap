@@ -1,15 +1,15 @@
-# Base
-FROM golang:1.27.0-alpine AS builder
-
-RUN apk add --no-cache git build-base gcc musl-dev
-WORKDIR /app
-COPY . /app
-RUN go mod download
-RUN go build ./cmd/asnmap
-
 FROM alpine:3.24.1
+
+LABEL org.opencontainers.image.authors="ProjectDiscovery"
+LABEL org.opencontainers.image.description="Go CLI and Library for quickly mapping organization network ranges using ASN information."
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.title="asnmap"
+LABEL org.opencontainers.image.url="https://github.com/projectdiscovery/asnmap"
+
 RUN apk -U upgrade --no-cache \
     && apk add --no-cache bind-tools ca-certificates
-COPY --from=builder /app/asnmap /usr/local/bin/
+
+ARG TARGETPLATFORM
+COPY $TARGETPLATFORM/asnmap /usr/local/bin/
 
 ENTRYPOINT ["asnmap"]
