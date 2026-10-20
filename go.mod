@@ -2,6 +2,8 @@ module github.com/projectdiscovery/asnmap
 
 go 1.24.0
 
+toolchain go1.26.10
+
 require (
 	github.com/projectdiscovery/goflags v0.1.56
 	github.com/projectdiscovery/gologger v1.1.12
