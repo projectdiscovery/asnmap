@@ -194,10 +194,7 @@ func (c Client) makeRequest() ([]byte, error) {
 	if res.StatusCode == http.StatusBadRequest {
 		body, _ := io.ReadAll(res.Body)
 		bodyStr := string(body)
-		errMsg := fmt.Sprintf("bad request: %s", bodyStr)
-
-		gologger.Error().Msg(errMsg)
-		return nil, errors.New(errMsg)
+		return nil, fmt.Errorf("bad request: %s", bodyStr)
 	}
 
 	resBody, err := io.ReadAll(res.Body)

@@ -3,6 +3,7 @@ package runner
 import (
 	"bufio"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -101,9 +102,13 @@ func (r *Runner) process() error {
 			var responses []asnmap.Response
 			for _, resolvedIp := range resolvedIps {
 				ls, err := r.client.GetDataWithCustomInput(resolvedIp, item)
-				if err != nil {
+				if errors.Is(err, asnmap.ErrUnAuthorized) {
 					errProcess = err
-					break
+					return err
+				}
+				if err != nil {
+					gologger.Warning().Msgf("skipping %s (%s): %s", item, resolvedIp, err)
+					continue
 				}
 
 				for _, l := range ls {
@@ -122,9 +127,13 @@ func (r *Runner) process() error {
 
 		default:
 			ls, err := r.client.GetData(item)
-			if err != nil {
+			if errors.Is(err, asnmap.ErrUnAuthorized) {
 				errProcess = err
 				return err
+			}
+			if err != nil {
+				gologger.Warning().Msgf("skipping %s: %s", item, err)
+				return nil
 			}
 			if len(ls) == 0 {
 				gologger.Verbose().Msgf("No records found for %v", item)
