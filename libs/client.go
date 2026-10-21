@@ -2,7 +2,6 @@ package asnmap
 
 import (
 	"bufio"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -75,14 +74,9 @@ func NewClient() (*Client, error) {
 		return nil, err
 	}
 
-	// ignore expired SSL certificates
-	transCfg := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
 	client := Client{
 		url:  URL,
-		http: &http.Client{Transport: transCfg},
+		http: &http.Client{},
 	}
 	return &client, nil
 }
@@ -145,8 +139,7 @@ func (c *Client) setProxy(proxyString string) (*url.URL, error) {
 	switch proxyurl.Scheme {
 	case "http", "https":
 		c.http.Transport = &http.Transport{
-			Proxy:           http.ProxyURL(proxyurl),
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			Proxy: http.ProxyURL(proxyurl),
 		}
 		return proxyurl, nil
 	case "socks5":
