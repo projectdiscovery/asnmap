@@ -41,7 +41,7 @@
 
 ## Installation
 
-asnmap requires **Go 1.21** to install successfully. To install, just run the below command or download pre-compiled binary from [release page](https://github.com/projectdiscovery/asnmap/releases).
+asnmap requires **Go 1.26.10** to install successfully. To install, just run the below command or download pre-compiled binary from [release page](https://github.com/projectdiscovery/asnmap/releases).
 
 ```console
 go install github.com/projectdiscovery/asnmap/cmd/asnmap@latest
