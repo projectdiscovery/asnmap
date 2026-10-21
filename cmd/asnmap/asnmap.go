@@ -39,12 +39,8 @@ func main() {
 	if err := asnmapRunner.Run(); err != nil {
 		if errors.Is(err, asnmap.ErrUnAuthorized) {
 			gologger.Info().Msgf("Try again after authenticating with PDCP\n\n")
-			// trigger auth callback
+			// exits once credentials are saved, so the user reruns with the new key
 			pdcp.CheckNValidateCredentials("asnmap")
-			// run again
-			if err := asnmapRunner.Run(); err != nil {
-				gologger.Fatal().Msgf("%s\n", err)
-			}
 		}
 		gologger.Fatal().Msgf("%s\n", err)
 	}
