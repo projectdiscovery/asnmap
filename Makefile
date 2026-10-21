@@ -3,6 +3,7 @@ GOCMD=go
 GOBUILD=$(GOCMD) build
 GOMOD=$(GOCMD) mod
 GOTEST=$(GOCMD) test
+GOCLEAN=$(GOCMD) clean
 GOFLAGS := -v
 # This should be disabled if the binary uses pprof
 LDFLAGS := -s -w
