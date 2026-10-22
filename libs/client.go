@@ -23,7 +23,11 @@ import (
 	"golang.org/x/net/proxy"
 )
 
-const serverURL = "https://asn.projectdiscovery.io/"
+const (
+	serverURL = "https://asn.projectdiscovery.io/"
+	// the largest ASN responses arrive in a few seconds, so this only trips on a stalled server
+	requestTimeout = 30 * time.Second
+)
 
 var (
 	PDCPApiKey      = env.GetEnvOrDefault("PDCP_API_KEY", "")
@@ -76,7 +80,7 @@ func NewClient() (*Client, error) {
 
 	client := Client{
 		url:  URL,
-		http: &http.Client{},
+		http: &http.Client{Timeout: requestTimeout},
 	}
 	return &client, nil
 }
