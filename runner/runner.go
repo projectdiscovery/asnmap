@@ -107,7 +107,7 @@ func (r *Runner) process() error {
 					return err
 				}
 				if err != nil {
-					gologger.Warning().Msgf("skipping %s (%s): %s", item, resolvedIp, err)
+					gologger.Error().Msgf("skipping %s (%s): %s", item, resolvedIp, err)
 					continue
 				}
 
@@ -132,7 +132,7 @@ func (r *Runner) process() error {
 				return err
 			}
 			if err != nil {
-				gologger.Warning().Msgf("skipping %s: %s", item, err)
+				gologger.Error().Msgf("skipping %s: %s", item, err)
 				return nil
 			}
 			if len(ls) == 0 {
