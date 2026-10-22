@@ -96,7 +96,7 @@ func ParseOptions() *Options {
 		flagSet.StringSliceVarP(&options.Asn, "asn", "a", nil, "target asn to lookup, example: -a AS5650", goflags.FileNormalizedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Ip, "ip", "i", nil, "target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40:: ", goflags.FileNormalizedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Domain, "domain", "d", nil, "target domain to lookup, example: -d google.com, -d facebook.com", goflags.FileNormalizedStringSliceOptions),
-		flagSet.StringSliceVar(&options.Org, "org", nil, "target organization to lookup, example: -org GOOGLE", goflags.StringSliceOptions),
+		flagSet.StringSliceVar(&options.Org, "org", nil, "target organization to lookup, example: -org GOOGLE", goflags.FileStringSliceOptions),
 		flagSet.StringSliceVarP(&options.FileInput, "file", "f", nil, "targets to lookup from file", goflags.FileCommaSeparatedStringSliceOptions),
 	)
 
