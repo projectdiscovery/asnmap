@@ -70,6 +70,8 @@ func (r *Runner) filterIPv6(ipsnet []*net.IPNet) []*net.IPNet {
 
 // writeOutput either to file or to stdout
 func (r *Runner) writeOutput(output []*asnmap.Response) error {
+	r.outputMu.Lock()
+	defer r.outputMu.Unlock()
 	if r.options.OnResult != nil {
 		r.options.OnResult(output)
 	}

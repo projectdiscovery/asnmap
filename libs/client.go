@@ -160,12 +160,12 @@ func (c *Client) setProxy(proxyString string) (*url.URL, error) {
 	}
 }
 
-func (c Client) makeRequest() ([]byte, error) {
+func (c Client) makeRequest(reqURL string) ([]byte, error) {
 	if c.http == nil {
 		return nil, errors.New("http client is not initialized")
 	}
 
-	req, err := http.NewRequest(http.MethodGet, c.url.String(), nil)
+	req, err := http.NewRequest(http.MethodGet, reqURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -224,9 +224,11 @@ func (c Client) GetData(input string, medatadas ...string) ([]*Response, error) 
 
 	params.Decode(updateutils.GetpdtmParams(Version))
 
-	c.url.RawQuery = params.Encode()
+	// copy so concurrent calls don't share the query
+	reqURL := *c.url
+	reqURL.RawQuery = params.Encode()
 
-	resp, err := c.makeRequest()
+	resp, err := c.makeRequest(reqURL.String())
 	if err != nil {
 		return nil, err
 	}
