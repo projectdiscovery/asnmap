@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io"
 	"os"
-	"strings"
 
 	asnmap "github.com/projectdiscovery/asnmap/libs"
 	"github.com/projectdiscovery/goflags"
@@ -39,6 +38,7 @@ type Options struct {
 	DisplayIPv6        bool
 	OnResult           OnResultCallback
 	DisableUpdateCheck bool
+	Threads            int
 }
 
 // configureOutput configures the output on the screen
@@ -77,12 +77,24 @@ func (options *Options) validateOptions() error {
 	// validate asn input
 	if options.Asn != nil {
 		for _, asn := range options.Asn {
-			if !strings.HasPrefix(strings.ToUpper(asn), "AS") {
-				return errors.New("invalid ASN given. it should start with prefix 'AS', example : AS14421")
+			if t := asnmap.IdentifyInput(asn); t != asnmap.ASN && t != asnmap.ASNID {
+				return errors.New("invalid ASN given, example: AS14421 or 14421")
 			}
 		}
 	}
 	return nil
+}
+
+// setInputFlags registers the target flags. -org uses FileStringSliceOptions so a
+// file is one organization per line and names that contain commas stay intact.
+func setInputFlags(flagSet *goflags.FlagSet, options *Options) {
+	flagSet.CreateGroup("input", "Input",
+		flagSet.StringSliceVarP(&options.Asn, "asn", "a", nil, "target asn to lookup, example: -a AS5650, -a 5650", goflags.FileNormalizedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Ip, "ip", "i", nil, "target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40:: ", goflags.FileNormalizedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Domain, "domain", "d", nil, "target domain to lookup, example: -d google.com, -d facebook.com", goflags.FileNormalizedStringSliceOptions),
+		flagSet.StringSliceVar(&options.Org, "org", nil, "target organization to lookup, example: -org GOOGLE", goflags.FileStringSliceOptions),
+		flagSet.StringSliceVarP(&options.FileInput, "file", "f", nil, "targets to lookup from file", goflags.FileCommaSeparatedStringSliceOptions),
+	)
 }
 
 // ParseOptions parses the command line options for application
@@ -91,14 +103,7 @@ func ParseOptions() *Options {
 	flagSet := goflags.NewFlagSet()
 	flagSet.SetDescription(`Go CLI and Library for quickly mapping organization network ranges using ASN information.`)
 
-	// Input
-	flagSet.CreateGroup("input", "Input",
-		flagSet.StringSliceVarP(&options.Asn, "asn", "a", nil, "target asn to lookup, example: -a AS5650", goflags.FileNormalizedStringSliceOptions),
-		flagSet.StringSliceVarP(&options.Ip, "ip", "i", nil, "target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40:: ", goflags.FileNormalizedStringSliceOptions),
-		flagSet.StringSliceVarP(&options.Domain, "domain", "d", nil, "target domain to lookup, example: -d google.com, -d facebook.com", goflags.FileNormalizedStringSliceOptions),
-		flagSet.StringSliceVar(&options.Org, "org", nil, "target organization to lookup, example: -org GOOGLE", goflags.StringSliceOptions),
-		flagSet.StringSliceVarP(&options.FileInput, "file", "f", nil, "targets to lookup from file", goflags.FileCommaSeparatedStringSliceOptions),
-	)
+	setInputFlags(flagSet, options)
 
 	// Configs
 	flagSet.CreateGroup("configs", "Configurations",
@@ -106,6 +111,7 @@ func ParseOptions() *Options {
 		flagSet.StringVar(&cfgFile, "config", "", "path to the asnmap configuration file"),
 		flagSet.StringSliceVarP(&options.Resolvers, "resolvers", "r", nil, "list of resolvers to use", goflags.FileCommaSeparatedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Proxy, "proxy", "p", nil, "list of proxy to use (comma separated or file input)", goflags.FileCommaSeparatedStringSliceOptions),
+		flagSet.IntVarP(&options.Threads, "threads", "t", 10, "number of concurrent lookups"),
 	)
 
 	// Update

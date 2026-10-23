@@ -1,9 +1,13 @@
 package runner
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"sync"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	asnmap "github.com/projectdiscovery/asnmap/libs"
 
@@ -168,4 +172,56 @@ func TestProcessSkipsFailedInput(t *testing.T) {
 	require.Nil(t, r.process())
 	require.Len(t, got, 1)
 	require.Equal(t, 13335, got[0].ASN)
+}
+
+func TestProcessConcurrent(t *testing.T) {
+	var inFlight, maxInFlight atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		n := inFlight.Add(1)
+		defer inFlight.Add(-1)
+		for {
+			m := maxInFlight.Load()
+			if n <= m || maxInFlight.CompareAndSwap(m, n) {
+				break
+			}
+		}
+		// hold each request so overlapping ones are observable
+		time.Sleep(50 * time.Millisecond)
+		_, _ = fmt.Fprintf(w, `[{"first_ip":"1.1.1.0","last_ip":"1.1.1.255","asn":%s,"country":"US","org":"test"}]`, r.URL.Query().Get("asn"))
+	}))
+	defer srv.Close()
+	t.Setenv("SERVER_URL", srv.URL)
+
+	apiKey := asnmap.PDCPApiKey
+	asnmap.PDCPApiKey = "test"
+	defer func() { asnmap.PDCPApiKey = apiKey }()
+
+	var asns []string
+	for i := 1; i <= 20; i++ {
+		asns = append(asns, fmt.Sprintf("AS%d", i))
+	}
+	var (
+		mu  sync.Mutex
+		got = map[int]bool{}
+	)
+	options := &Options{
+		Asn:     asns,
+		Threads: 5,
+		OnResult: func(o []*asnmap.Response) {
+			mu.Lock()
+			defer mu.Unlock()
+			for _, r := range o {
+				got[r.ASN] = true
+			}
+		},
+	}
+	r, err := New(options)
+	require.Nil(t, err)
+	defer func() { _ = r.Close() }()
+
+	require.Nil(t, r.prepareInput())
+	require.Nil(t, r.process())
+	require.Len(t, got, 20)
+	require.Greater(t, maxInFlight.Load(), int32(1))
+	require.LessOrEqual(t, maxInFlight.Load(), int32(5))
 }

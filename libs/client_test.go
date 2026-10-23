@@ -1,9 +1,11 @@
 package asnmap
 
 import (
-	"github.com/stretchr/testify/require"
-
+	"net/http"
+	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetASNFromIP(t *testing.T) {
@@ -127,7 +129,7 @@ func TestGetASNFromOrg(t *testing.T) {
 			} else {
 				require.Nil(t, err)
 			}
-			// // Expecting true from comparision
+			// // Expecting true from comparison
 			for _, result := range tc.expected {
 				x := compareResponse(i, result)
 				require.True(t, x)
@@ -145,4 +147,17 @@ func compareResponse(respA []*Response, respB *Response) bool {
 		}
 	}
 	return false
+}
+
+func TestClientTimeout(t *testing.T) {
+	client, err := NewClient()
+	require.Nil(t, err)
+	require.Equal(t, requestTimeout, client.http.Timeout)
+
+	// setting a proxy swaps the transport and must keep the timeout
+	proxySrv := httptest.NewServer(http.NotFoundHandler())
+	defer proxySrv.Close()
+	_, err = client.SetProxy([]string{proxySrv.URL})
+	require.Nil(t, err)
+	require.Equal(t, requestTimeout, client.http.Timeout)
 }
