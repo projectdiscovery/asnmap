@@ -68,8 +68,11 @@ INPUT:
    -f, -file string[]    targets to lookup from file
 
 CONFIGURATIONS:
+   -auth                    configure ProjectDiscovery Cloud Platform (PDCP) api key (default true)
    -config string           path to the asnmap configuration file
    -r, -resolvers string[]  list of resolvers to use
+   -p, -proxy string[]      list of proxy to use (comma separated or file input)
+   -t, -threads int         number of concurrent lookups (default 10)
 
 UPDATE:
    -up, -update                 update asnmap to latest version
