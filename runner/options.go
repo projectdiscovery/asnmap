@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io"
 	"os"
-	"strings"
 
 	asnmap "github.com/projectdiscovery/asnmap/libs"
 	"github.com/projectdiscovery/goflags"
@@ -77,8 +76,8 @@ func (options *Options) validateOptions() error {
 	// validate asn input
 	if options.Asn != nil {
 		for _, asn := range options.Asn {
-			if !strings.HasPrefix(strings.ToUpper(asn), "AS") {
-				return errors.New("invalid ASN given. it should start with prefix 'AS', example : AS14421")
+			if t := asnmap.IdentifyInput(asn); t != asnmap.ASN && t != asnmap.ASNID {
+				return errors.New("invalid ASN given, example: AS14421 or 14421")
 			}
 		}
 	}
@@ -89,7 +88,7 @@ func (options *Options) validateOptions() error {
 // file is one organization per line and names that contain commas stay intact.
 func setInputFlags(flagSet *goflags.FlagSet, options *Options) {
 	flagSet.CreateGroup("input", "Input",
-		flagSet.StringSliceVarP(&options.Asn, "asn", "a", nil, "target asn to lookup, example: -a AS5650", goflags.FileNormalizedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Asn, "asn", "a", nil, "target asn to lookup, example: -a AS5650, -a 5650", goflags.FileNormalizedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Ip, "ip", "i", nil, "target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40:: ", goflags.FileNormalizedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Domain, "domain", "d", nil, "target domain to lookup, example: -d google.com, -d facebook.com", goflags.FileNormalizedStringSliceOptions),
 		flagSet.StringSliceVar(&options.Org, "org", nil, "target organization to lookup, example: -org GOOGLE", goflags.FileStringSliceOptions),
