@@ -38,6 +38,7 @@ type Options struct {
 	DisplayIPv6        bool
 	OnResult           OnResultCallback
 	DisableUpdateCheck bool
+	Threads            int
 }
 
 // configureOutput configures the output on the screen
@@ -110,6 +111,7 @@ func ParseOptions() *Options {
 		flagSet.StringVar(&cfgFile, "config", "", "path to the asnmap configuration file"),
 		flagSet.StringSliceVarP(&options.Resolvers, "resolvers", "r", nil, "list of resolvers to use", goflags.FileCommaSeparatedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Proxy, "proxy", "p", nil, "list of proxy to use (comma separated or file input)", goflags.FileCommaSeparatedStringSliceOptions),
+		flagSet.IntVarP(&options.Threads, "threads", "t", 10, "number of concurrent lookups"),
 	)
 
 	// Update
