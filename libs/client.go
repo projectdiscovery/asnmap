@@ -178,7 +178,7 @@ func (c Client) makeRequest() ([]byte, error) {
 		return nil, ErrUnAuthorized
 	}
 	req.Header.Set("X-PDCP-Key", PDCPApiKey)
-	res, err := c.http.Do(req)
+	res, err := c.do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -192,6 +192,10 @@ func (c Client) makeRequest() ([]byte, error) {
 		body, _ := io.ReadAll(res.Body)
 		bodyStr := string(body)
 		return nil, fmt.Errorf("bad request: %s", bodyStr)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status: %s", res.Status)
 	}
 
 	resBody, err := io.ReadAll(res.Body)
