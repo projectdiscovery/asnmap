@@ -2,7 +2,6 @@ package asnmap
 
 import (
 	"bufio"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -24,7 +23,11 @@ import (
 	"golang.org/x/net/proxy"
 )
 
-const serverURL = "https://asn.projectdiscovery.io/"
+const (
+	serverURL = "https://asn.projectdiscovery.io/"
+	// the largest ASN responses arrive in a few seconds, so this only trips on a stalled server
+	requestTimeout = 30 * time.Second
+)
 
 var (
 	PDCPApiKey      = env.GetEnvOrDefault("PDCP_API_KEY", "")
@@ -75,14 +78,9 @@ func NewClient() (*Client, error) {
 		return nil, err
 	}
 
-	// ignore expired SSL certificates
-	transCfg := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
 	client := Client{
 		url:  URL,
-		http: &http.Client{Transport: transCfg},
+		http: &http.Client{Timeout: requestTimeout},
 	}
 	return &client, nil
 }
@@ -113,7 +111,7 @@ func (c *Client) setProxyFromFile(fileName string) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		proxy := strings.TrimSpace(scanner.Text())
@@ -145,8 +143,7 @@ func (c *Client) setProxy(proxyString string) (*url.URL, error) {
 	switch proxyurl.Scheme {
 	case "http", "https":
 		c.http.Transport = &http.Transport{
-			Proxy:           http.ProxyURL(proxyurl),
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			Proxy: http.ProxyURL(proxyurl),
 		}
 		return proxyurl, nil
 	case "socks5":
@@ -154,8 +151,12 @@ func (c *Client) setProxy(proxyString string) (*url.URL, error) {
 		if err != nil {
 			return nil, err
 		}
+		contextDialer, ok := dialer.(proxy.ContextDialer)
+		if !ok {
+			return nil, errors.New("socks5 dialer does not support DialContext")
+		}
 		c.http.Transport = &http.Transport{
-			Dial: dialer.Dial,
+			DialContext: contextDialer.DialContext,
 		}
 		return proxyurl, nil
 	default:
@@ -163,12 +164,12 @@ func (c *Client) setProxy(proxyString string) (*url.URL, error) {
 	}
 }
 
-func (c Client) makeRequest() ([]byte, error) {
+func (c Client) makeRequest(reqURL string) ([]byte, error) {
 	if c.http == nil {
 		return nil, errors.New("http client is not initialized")
 	}
 
-	req, err := http.NewRequest(http.MethodGet, c.url.String(), nil)
+	req, err := http.NewRequest(http.MethodGet, reqURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -177,11 +178,11 @@ func (c Client) makeRequest() ([]byte, error) {
 		return nil, ErrUnAuthorized
 	}
 	req.Header.Set("X-PDCP-Key", PDCPApiKey)
-	res, err := c.http.Do(req)
+	res, err := c.do(req)
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	if res.StatusCode == http.StatusUnauthorized {
 		gologger.Error().Msgf("missing or invalid api key (get free api key & configure it from https://cloud.projectdiscovery.io/?ref=api_key)")
 		return nil, ErrUnAuthorized
@@ -190,10 +191,11 @@ func (c Client) makeRequest() ([]byte, error) {
 	if res.StatusCode == http.StatusBadRequest {
 		body, _ := io.ReadAll(res.Body)
 		bodyStr := string(body)
-		errMsg := fmt.Sprintf("bad request: %s", bodyStr)
+		return nil, fmt.Errorf("bad request: %s", bodyStr)
+	}
 
-		gologger.Error().Msg(errMsg)
-		return nil, errors.New(errMsg)
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status: %s", res.Status)
 	}
 
 	resBody, err := io.ReadAll(res.Body)
@@ -230,9 +232,11 @@ func (c Client) GetData(input string, medatadas ...string) ([]*Response, error) 
 
 	params.Decode(updateutils.GetpdtmParams(Version))
 
-	c.url.RawQuery = params.Encode()
+	// copy so concurrent calls don't share the query
+	reqURL := *c.url
+	reqURL.RawQuery = params.Encode()
 
-	resp, err := c.makeRequest()
+	resp, err := c.makeRequest(reqURL.String())
 	if err != nil {
 		return nil, err
 	}

@@ -3,22 +3,26 @@ package runner
 import (
 	"bufio"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+	"sync"
 
 	asnmap "github.com/projectdiscovery/asnmap/libs"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/hmap/store/hybrid"
 	fileutil "github.com/projectdiscovery/utils/file"
 	sliceutil "github.com/projectdiscovery/utils/slice"
+	syncutil "github.com/projectdiscovery/utils/sync"
 )
 
 type Runner struct {
-	options *Options
-	hm      *hybrid.HybridMap
-	client  *asnmap.Client
+	options  *Options
+	hm       *hybrid.HybridMap
+	client   *asnmap.Client
+	outputMu sync.Mutex
 }
 
 func New(options *Options) (*Runner, error) {
@@ -80,65 +84,99 @@ func (r *Runner) Run() error {
 	return r.process()
 }
 
-// Process Function makes request to client returns response
+// process looks up every input with up to Threads concurrent workers
 func (r *Runner) process() error {
-	var errProcess error
+	wg, err := syncutil.New(syncutil.WithSize(max(r.options.Threads, 1)))
+	if err != nil {
+		return err
+	}
+	var (
+		errMu      sync.Mutex
+		errProcess error
+	)
 	r.hm.Scan(func(key, _ []byte) error {
+		errMu.Lock()
+		err := errProcess
+		errMu.Unlock()
+		// stop scheduling new inputs once a worker hit a fatal error
+		if err != nil {
+			return err
+		}
 		item := string(key)
-		switch asnmap.IdentifyInput(item) {
-		case asnmap.Domain:
-			resolvedIps, err := asnmap.ResolveDomain(item, r.options.Resolvers...)
-			if err != nil {
-				gologger.Verbose().Msgf("could not resolve '%s': %v", item, err)
-				return nil
-			}
-
-			if len(resolvedIps) == 0 {
-				gologger.Verbose().Msgf("No records found for %v", item)
-				return nil
-			}
-
-			var responses []asnmap.Response
-			for _, resolvedIp := range resolvedIps {
-				ls, err := r.client.GetDataWithCustomInput(resolvedIp, item)
-				if err != nil {
+		wg.Add()
+		go func() {
+			defer wg.Done()
+			if err := r.processItem(item); err != nil {
+				errMu.Lock()
+				if errProcess == nil {
 					errProcess = err
-					break
 				}
-
-				for _, l := range ls {
-					if !sliceutil.Contains(responses, *l) {
-						responses = append(responses, *l)
-					}
-				}
+				errMu.Unlock()
 			}
+		}()
+		return nil
+	})
+	wg.Wait()
+	return errProcess
+}
 
-			for _, response := range responses {
-				if err := r.writeOutput([]*asnmap.Response{&response}); err != nil {
-					errProcess = err
-					return err
-				}
-			}
+func (r *Runner) processItem(item string) error {
+	switch asnmap.IdentifyInput(item) {
+	case asnmap.Domain:
+		resolvedIps, err := asnmap.ResolveDomain(item, r.options.Resolvers...)
+		if err != nil {
+			gologger.Verbose().Msgf("could not resolve '%s': %v", item, err)
+			return nil
+		}
 
-		default:
-			ls, err := r.client.GetData(item)
-			if err != nil {
-				errProcess = err
+		if len(resolvedIps) == 0 {
+			gologger.Verbose().Msgf("No records found for %v", item)
+			return nil
+		}
+
+		var responses []asnmap.Response
+		for _, resolvedIp := range resolvedIps {
+			ls, err := r.client.GetDataWithCustomInput(resolvedIp, item)
+			if errors.Is(err, asnmap.ErrUnAuthorized) {
 				return err
 			}
-			if len(ls) == 0 {
-				gologger.Verbose().Msgf("No records found for %v", item)
-				return nil
+			if err != nil {
+				gologger.Error().Msgf("skipping %s (%s): %s", item, resolvedIp, err)
+				continue
 			}
-			if err := r.writeOutput(ls); err != nil {
-				errProcess = err
+
+			for _, l := range ls {
+				if !sliceutil.Contains(responses, *l) {
+					responses = append(responses, *l)
+				}
+			}
+		}
+
+		for _, response := range responses {
+			if err := r.writeOutput([]*asnmap.Response{&response}); err != nil {
 				return err
 			}
 		}
 
-		return nil
-	})
-	return errProcess
+	default:
+		ls, err := r.client.GetData(item)
+		if errors.Is(err, asnmap.ErrUnAuthorized) {
+			return err
+		}
+		if err != nil {
+			gologger.Error().Msgf("skipping %s: %s", item, err)
+			return nil
+		}
+		if len(ls) == 0 {
+			gologger.Verbose().Msgf("No records found for %v", item)
+			return nil
+		}
+		if err := r.writeOutput(ls); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *Runner) setItem(v string) {

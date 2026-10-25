@@ -41,7 +41,7 @@
 
 ## Installation
 
-asnmap requires **Go 1.21** to install successfully. To install, just run the below command or download pre-compiled binary from [release page](https://github.com/projectdiscovery/asnmap/releases).
+asnmap requires **Go 1.26.10** to install successfully. To install, just run the below command or download pre-compiled binary from [release page](https://github.com/projectdiscovery/asnmap/releases).
 
 ```console
 go install github.com/projectdiscovery/asnmap/cmd/asnmap@latest
@@ -61,15 +61,18 @@ Usage:
 
 Flags:
 INPUT:
-   -a, -asn string[]     target asn to lookup, example: -a AS5650
+   -a, -asn string[]     target asn to lookup, example: -a AS5650, -a 5650
    -i, -ip string[]      target ip to lookup, example: -i 100.19.12.21, -i 2a10:ad40::
    -d, -domain string[]  target domain to lookup, example: -d google.com, -d facebook.com
    -org string[]         target organization to lookup, example: -org GOOGLE
    -f, -file string[]    targets to lookup from file
 
 CONFIGURATIONS:
+   -auth                    configure ProjectDiscovery Cloud Platform (PDCP) api key (default true)
    -config string           path to the asnmap configuration file
    -r, -resolvers string[]  list of resolvers to use
+   -p, -proxy string[]      list of proxy to use (comma separated or file input)
+   -t, -threads int         number of concurrent lookups (default 10)
 
 UPDATE:
    -up, -update                 update asnmap to latest version
