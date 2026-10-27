@@ -19,149 +19,95 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// newTestServer points the client at a local server instead of the live API
+func newTestServer(t *testing.T, handler http.HandlerFunc) {
+	srv := httptest.NewServer(handler)
+	t.Cleanup(srv.Close)
+	t.Setenv("SERVER_URL", srv.URL)
+
+	apiKey := asnmap.PDCPApiKey
+	asnmap.PDCPApiKey = "test"
+	t.Cleanup(func() { asnmap.PDCPApiKey = apiKey })
+}
+
 func TestRunner(t *testing.T) {
-	// CIDR ranges and the exact set of records returned by the
-	// upstream ASN service change over time. Pin only the stable
-	// fields (ASN, Org, Country, Input) so the suite isn't broken
-	// every time the database is updated.
+	newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		switch {
+		case q.Get("ip") == "104.16.99.52":
+			_, _ = w.Write([]byte(`[{"first_ip":"104.16.0.0","last_ip":"104.31.255.255","asn":13335,"country":"US","org":"cloudflarenet"}]`))
+		case q.Get("asn") == "14421":
+			_, _ = w.Write([]byte(`[{"first_ip":"216.101.17.0","last_ip":"216.101.17.255","asn":14421,"country":"US","org":"theravance"}]`))
+		case q.Get("org") == "microsoft":
+			_, _ = w.Write([]byte(`[{"first_ip":"13.64.0.0","last_ip":"13.107.255.255","asn":8075,"country":"US","org":"microsoft"}]`))
+		default:
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(`{"error":"no results found"}`))
+		}
+	})
+
 	tests := []struct {
-		name    string
-		options *Options
-		assert  func(t *testing.T, got []*asnmap.Response)
+		name     string
+		options  *Options
+		expected []*asnmap.Response
 	}{
-		{
-			name:    "IP",
-			options: &Options{Ip: []string{"104.16.99.52"}},
-			assert: func(t *testing.T, got []*asnmap.Response) {
-				require.NotEmpty(t, got)
-				for _, r := range got {
-					require.Equal(t, 13335, r.ASN)
-					require.Equal(t, "cloudflarenet", r.Org)
-					require.Equal(t, "US", r.Country)
-					require.Equal(t, "104.16.99.52", r.Input)
-				}
-			},
-		},
-		{
-			name:    "ASN",
-			options: &Options{Asn: []string{"AS14421"}},
-			assert: func(t *testing.T, got []*asnmap.Response) {
-				require.NotEmpty(t, got)
-				for _, r := range got {
-					require.Equal(t, 14421, r.ASN)
-					require.Equal(t, "14421", r.Input)
-				}
-			},
-		},
-		{
-			name:    "Org",
-			options: &Options{Org: []string{"microsoft"}},
-			assert: func(t *testing.T, got []*asnmap.Response) {
-				require.NotEmpty(t, got)
-				for _, r := range got {
-					require.Equal(t, 12076, r.ASN)
-					require.Equal(t, "microsoft", r.Org)
-					require.Equal(t, "microsoft", r.Input)
-				}
-			},
-		},
+		{"IP", &Options{Ip: []string{"104.16.99.52"}}, []*asnmap.Response{
+			{FirstIp: "104.16.0.0", LastIp: "104.31.255.255", Input: "104.16.99.52", ASN: 13335, Country: "US", Org: "cloudflarenet"},
+		}},
+		{"ASN", &Options{Asn: []string{"AS14421"}}, []*asnmap.Response{
+			{FirstIp: "216.101.17.0", LastIp: "216.101.17.255", Input: "14421", ASN: 14421, Country: "US", Org: "theravance"},
+		}},
+		{"Org", &Options{Org: []string{"microsoft"}}, []*asnmap.Response{
+			{FirstIp: "13.64.0.0", LastIp: "13.107.255.255", Input: "microsoft", ASN: 8075, Country: "US", Org: "microsoft"},
+		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.options.OnResult = func(o []*asnmap.Response) {
-				tt.assert(t, o)
-			}
+			var got []*asnmap.Response
+			tt.options.OnResult = func(o []*asnmap.Response) { got = append(got, o...) }
 			r, err := New(tt.options)
 			require.Nil(t, err)
+			t.Cleanup(func() { _ = r.Close() })
 
-			err = r.prepareInput()
-			require.Nil(t, err)
-
-			err = r.process()
-			require.Nil(t, err)
-
-			err = r.Close()
-			require.Nil(t, err)
+			require.Nil(t, r.prepareInput())
+			require.Nil(t, r.process())
+			require.Equal(t, tt.expected, got)
 		})
 	}
 }
 
 func TestProcessForDomainInput(t *testing.T) {
-	tests := []struct {
-		name           string
-		inputchan      chan interface{}
-		outputchan     chan []*asnmap.Response
-		options        *Options
-		expectedOutput *asnmap.Response
-	}{
-		{
-			name:       "Domain",
-			inputchan:  make(chan interface{}),
-			outputchan: make(chan []*asnmap.Response),
-			options: &Options{
-				Domain: []string{"google.com"},
-			},
-			expectedOutput: &asnmap.Response{
-				FirstIp: "142.250.0.0",
-				LastIp:  "142.250.82.255",
-				Input:   "google.com",
-				ASN:     15169,
-				Country: "US",
-				Org:     "google",
-			},
-		},
+	// the domain still resolves through DNS, only the API is local
+	newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`[{"first_ip":"142.250.0.0","last_ip":"142.250.82.255","asn":15169,"country":"US","org":"google"}]`))
+	})
+
+	var got []*asnmap.Response
+	options := &Options{
+		Domain:   []string{"google.com"},
+		OnResult: func(o []*asnmap.Response) { got = append(got, o...) },
 	}
+	r, err := New(options)
+	require.Nil(t, err)
+	t.Cleanup(func() { _ = r.Close() })
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.options.OnResult = func(o []*asnmap.Response) {
-				x := compareResponse(o, tt.expectedOutput)
-				// // Expecting true from comparison
-				require.True(t, x)
-			}
-
-			r, err := New(tt.options)
-			require.Nil(t, err)
-
-			err = r.prepareInput()
-			require.Nil(t, err)
-
-			err = r.process()
-			require.Nil(t, err)
-
-			err = r.Close()
-			require.Nil(t, err)
-		})
-	}
-}
-
-// compareResponse compares ASN & ORG against given domain with expected output's ASN & ORG
-// Have excluded IPs for now as they might change in future.
-func compareResponse(respA []*asnmap.Response, respB *asnmap.Response) bool {
-	for _, r := range respA {
-		if r.Equal(*respB) {
-			return true
-		}
-	}
-
-	return false
+	require.Nil(t, r.prepareInput())
+	require.Nil(t, r.process())
+	// every resolved IP maps to the same range, so it is reported once
+	require.Equal(t, []*asnmap.Response{
+		{FirstIp: "142.250.0.0", LastIp: "142.250.82.255", Input: "google.com", ASN: 15169, Country: "US", Org: "google"},
+	}, got)
 }
 
 func TestProcessSkipsFailedInput(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("asn") == "1" {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(`{"error":"no results found"}`))
 			return
 		}
 		_, _ = w.Write([]byte(`[{"first_ip":"1.1.1.0","last_ip":"1.1.1.255","asn":13335,"country":"US","org":"cloudflarenet"}]`))
-	}))
-	defer srv.Close()
-	t.Setenv("SERVER_URL", srv.URL)
-
-	apiKey := asnmap.PDCPApiKey
-	asnmap.PDCPApiKey = "test"
-	defer func() { asnmap.PDCPApiKey = apiKey }()
+	})
 
 	var got []*asnmap.Response
 	// AS1 sorts first, so a failure there must not stop AS13335
@@ -181,7 +127,7 @@ func TestProcessSkipsFailedInput(t *testing.T) {
 
 func TestProcessConcurrent(t *testing.T) {
 	var inFlight, maxInFlight atomic.Int32
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		n := inFlight.Add(1)
 		defer inFlight.Add(-1)
 		for {
@@ -193,13 +139,7 @@ func TestProcessConcurrent(t *testing.T) {
 		// hold each request so overlapping ones are observable
 		time.Sleep(50 * time.Millisecond)
 		_, _ = fmt.Fprintf(w, `[{"first_ip":"1.1.1.0","last_ip":"1.1.1.255","asn":%s,"country":"US","org":"test"}]`, r.URL.Query().Get("asn"))
-	}))
-	defer srv.Close()
-	t.Setenv("SERVER_URL", srv.URL)
-
-	apiKey := asnmap.PDCPApiKey
-	asnmap.PDCPApiKey = "test"
-	defer func() { asnmap.PDCPApiKey = apiKey }()
+	})
 
 	var asns []string
 	for i := 1; i <= 20; i++ {
@@ -232,20 +172,14 @@ func TestProcessConcurrent(t *testing.T) {
 }
 
 func TestSkippedInputIsReported(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("asn") == "1" {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(`{"error":"no results found"}`))
 			return
 		}
 		_, _ = w.Write([]byte(`[{"first_ip":"1.1.1.0","last_ip":"1.1.1.255","asn":13335,"country":"US","org":"cloudflarenet"}]`))
-	}))
-	defer srv.Close()
-	t.Setenv("SERVER_URL", srv.URL)
-
-	apiKey := asnmap.PDCPApiKey
-	asnmap.PDCPApiKey = "test"
-	t.Cleanup(func() { asnmap.PDCPApiKey = apiKey })
+	})
 
 	capture := &logCapture{}
 	gologger.DefaultLogger.SetMaxLevel(levels.LevelInfo)
