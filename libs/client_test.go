@@ -8,145 +8,66 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetASNFromIP(t *testing.T) {
-	client, err := NewClient()
-	require.Nil(t, err)
-
-	t.Run("found", func(t *testing.T) {
-		ip := "100.19.12.21"
-		expectedResult := []*Response{{FirstIp: "", LastIp: "", Input: "100.19.12.21", ASN: 701, Country: "US", Org: "uunet"}}
-		i, err := client.GetData(ip)
-		require.Nil(t, err)
-		for _, result := range expectedResult {
-			x := compareResponse(i, result)
-			require.True(t, x)
-		}
-	})
-
-	t.Run("not found", func(t *testing.T) {
-		ip := "255.100.100.100"
-		expectedErrMsg := "bad request: {\"error\":\"no results found\"}"
-		_, err := client.GetData(ip)
-		require.NotNil(t, err)
-		require.EqualError(t, err, expectedErrMsg)
-	})
+// fakeAPI answers like asnmap-server for the inputs used in these tests
+func fakeAPI(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	switch {
+	case q.Get("ip") == "100.19.12.21":
+		_, _ = w.Write([]byte(`[{"first_ip":"100.19.0.0","last_ip":"100.19.255.255","asn":701,"country":"US","org":"uunet"}]`))
+	case q.Get("asn") == "14421":
+		_, _ = w.Write([]byte(`[{"first_ip":"216.101.17.0","last_ip":"216.101.17.255","asn":14421,"country":"US","org":"theravance"}]`))
+	case q.Get("asn") == "7712":
+		_, _ = w.Write([]byte(`[{"first_ip":"118.67.200.0","last_ip":"118.67.203.255","asn":7712,"country":"KH","org":"cne-as-ap"},{"first_ip":"118.67.204.0","last_ip":"118.67.207.255","asn":7712,"country":"KH","org":"cne-as-ap"}]`))
+	case q.Get("org") == "PPLINKNET":
+		_, _ = w.Write([]byte(`[{"first_ip":"45.239.52.0","last_ip":"45.239.55.255","asn":268353,"country":"BR","org":"PPLINKNET"}]`))
+	default:
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`{"error":"no results found"}`))
+	}
 }
 
-func TestGetIPFromASN(t *testing.T) {
-	client, err := NewClient()
-	require.Nil(t, err)
-
-	t.Run("zero match", func(t *testing.T) {
-		expectedErrMsg := "bad request: {\"error\":\"no results found\"}"
-		_, err := client.GetData("1123")
-		require.NotNil(t, err)
-		require.EqualError(t, err, expectedErrMsg)
-	})
-
-	t.Run("single match", func(t *testing.T) {
-		result := []*Response{{
-			FirstIp: "216.101.17.0",
-			LastIp:  "216.101.17.255",
-			Input:   "14421",
-			ASN:     14421,
-			Country: "US",
-			Org:     "theravance",
-		}}
-		i, err := client.GetData("14421")
-		require.Nil(t, err)
-		for _, expected := range result {
-			x := compareResponse(i, expected)
-			require.True(t, x)
-		}
-	})
-
-	t.Run("multi match", func(t *testing.T) {
-		result := []*Response{
-			{
-				FirstIp: "118.67.200.0",
-				LastIp:  "118.67.203.255",
-				Input:   "7712",
-				ASN:     7712,
-				Country: "KH",
-				Org:     "cne-as-ap cambodian network exchange co., ltd.",
-			},
-			{
-				FirstIp: "118.67.200.0",
-				LastIp:  "118.67.207.255",
-				Input:   "7712",
-				ASN:     7712,
-				Country: "KH",
-				Org:     "cne-as-ap cambodian network exchange co., ltd.",
-			},
-		}
-		i, err := client.GetData("7712")
-		require.Nil(t, err)
-		for _, expected := range result {
-			x := compareResponse(i, expected)
-			require.True(t, x)
-		}
-	})
-}
-
-func TestGetASNFromOrg(t *testing.T) {
-	t.Skip("asnmap-server returns null for this query, skipping")
-	client, err := NewClient()
-	require.Nil(t, err)
+func TestGetData(t *testing.T) {
+	client := newTestClient(t, fakeAPI)
+	noResults := "bad request: {\"error\":\"no results found\"}"
 
 	tt := []struct {
 		name     string
-		org      string
-		err      bool
+		input    string
 		expected []*Response
+		err      string
 	}{
-		{"not found", "RANDOM_TEXT", true, []*Response{}},
-		// Todo: excluding - ref: https://github.com/projectdiscovery/asnmap-server/issues/43
-		// {"regex match", "PPLINKNET*", false, []*Response{
-		// 	{
-		// 		FirstIp: "45.239.52.0",
-		// 		LastIp:  "45.239.55.255",
-		// 		Input:   "PPLINKNET",
-		// 		ASN:     268353,
-		// 		Country: "BR",
-		// 		Org:     "PPLINKNET SERVICOS DE COMUNICACAO LTDA - ME"},
-		// 	{
-		// 		FirstIp: "2804:4fd8::",
-		// 		LastIp:  "2804:4fd8:ffff:ffff:ffff:ffff:ffff:ffff",
-		// 		Input:   "PPLINKNET",
-		// 		ASN:     268353,
-		// 		Country: "BR",
-		// 		Org:     "PPLINKNET SERVICOS DE COMUNICACAO LTDA - ME"},
-		// }},
-		{"exact match", "PPLINKNET", false, []*Response{}},
+		{"ip", "100.19.12.21", []*Response{
+			{FirstIp: "100.19.0.0", LastIp: "100.19.255.255", Input: "100.19.12.21", ASN: 701, Country: "US", Org: "uunet"},
+		}, ""},
+		{"ip not found", "255.100.100.100", nil, noResults},
+		{"asn", "AS14421", []*Response{
+			{FirstIp: "216.101.17.0", LastIp: "216.101.17.255", Input: "14421", ASN: 14421, Country: "US", Org: "theravance"},
+		}, ""},
+		{"asn number", "14421", []*Response{
+			{FirstIp: "216.101.17.0", LastIp: "216.101.17.255", Input: "14421", ASN: 14421, Country: "US", Org: "theravance"},
+		}, ""},
+		{"asn multiple ranges", "AS7712", []*Response{
+			{FirstIp: "118.67.200.0", LastIp: "118.67.203.255", Input: "7712", ASN: 7712, Country: "KH", Org: "cne-as-ap"},
+			{FirstIp: "118.67.204.0", LastIp: "118.67.207.255", Input: "7712", ASN: 7712, Country: "KH", Org: "cne-as-ap"},
+		}, ""},
+		{"asn not found", "AS1123", nil, noResults},
+		{"org", "PPLINKNET", []*Response{
+			{FirstIp: "45.239.52.0", LastIp: "45.239.55.255", Input: "PPLINKNET", ASN: 268353, Country: "BR", Org: "PPLINKNET"},
+		}, ""},
+		{"org not found", "RANDOM_TEXT", nil, noResults},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			i, err := client.GetData(tc.org)
-			if tc.err {
-				require.NotNil(t, err)
+			got, err := client.GetData(tc.input)
+			if tc.err != "" {
+				require.EqualError(t, err, tc.err)
 				return
-			} else {
-				require.Nil(t, err)
 			}
-			// // Expecting true from comparison
-			for _, result := range tc.expected {
-				x := compareResponse(i, result)
-				require.True(t, x)
-			}
+			require.Nil(t, err)
+			require.Equal(t, tc.expected, got)
 		})
 	}
-}
-
-// compareResponse compares ASN & ORG against given domain with expected output's ASN & ORG
-// Have excluded IPs for now as they might change in future.
-func compareResponse(respA []*Response, respB *Response) bool {
-	for _, r := range respA {
-		if r.Equal(*respB) {
-			return true
-		}
-	}
-	return false
 }
 
 func TestClientTimeout(t *testing.T) {
