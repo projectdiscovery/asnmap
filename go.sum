@@ -144,8 +144,8 @@ github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 h1:o4JXh1EVt
 github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55/go.mod h1:OmDBASR4679mdNQnz2pUhc2G8CO2JrUAVFDRBDP/hJE=
 github.com/projectdiscovery/blackrock v0.0.2 h1:mxXdu0uM8P2L2Qi210COlU8QiICPFW/Rxk5QUhlPO2k=
 github.com/projectdiscovery/blackrock v0.0.2/go.mod h1:ANUtjDfaVrqB453bzToU+YB4cUbvBRpLvEwoWIwlTss=
-github.com/projectdiscovery/fastdialer v0.5.26 h1:wCCsopLsO1EF1V1+9Wqkxj1bMm6sRo8NdlzwE2Ib2Ss=
-github.com/projectdiscovery/fastdialer v0.5.26/go.mod h1:dZzEPnpsxqCiD3IkM5CN3RglW3l1gXJNyTkxqjPZIbs=
+github.com/projectdiscovery/fastdialer v0.6.1 h1:mRwzskHwyFD9fv8iYt85lRvX190Ocys1aDW8IJ7yuEk=
+github.com/projectdiscovery/fastdialer v0.6.1/go.mod h1:fZqTJhL43+skKCNeXXuxPA585dFuleIuFW02ZSudWZ8=
 github.com/projectdiscovery/goflags v0.2.1 h1:XnSYvsCjUwHbZaaJUZ3YznCJPoXRk/IhTFP9Gecmx6M=
 github.com/projectdiscovery/goflags v0.2.1/go.mod h1:7nAP1r2Dqgn/rwmOE3EWbZWUCEJKNIhVSBGpuzJAIns=
 github.com/projectdiscovery/gologger v1.1.75 h1:w+8DgCOCFpUegE2Ww8LQBUWPACkJUOvJ4Q1C0f2N9qI=
@@ -156,8 +156,8 @@ github.com/projectdiscovery/machineid v0.0.0-20250715113114-c77eb3567582 h1:eR+0
 github.com/projectdiscovery/machineid v0.0.0-20250715113114-c77eb3567582/go.mod h1:3G3BRKui7nMuDFAZKR/M2hiOLtaOmyukT20g88qRQjI=
 github.com/projectdiscovery/mapcidr v1.1.97 h1:7FkxNNVXp+m1rIu5Nv/2SrF9k4+LwP8QuWs2puwy+2w=
 github.com/projectdiscovery/mapcidr v1.1.97/go.mod h1:9dgTJh1SP02gYZdpzMjm6vtYFkEHQHoTyaVNvaeJ7lA=
-github.com/projectdiscovery/networkpolicy v0.1.55 h1:D30pipxOdWnSq3r7sX0kQvGyb18sUgopuda1j9NAmnQ=
-github.com/projectdiscovery/networkpolicy v0.1.55/go.mod h1:N5bXm8L3UsDw51CeA1nhTsGEbQMbgL5lXTiIU013xd0=
+github.com/projectdiscovery/networkpolicy v0.1.57 h1:3P7esW8KE3yoZSE/GvswbSZ1bh8Gk+dURtvNlFzOid0=
+github.com/projectdiscovery/networkpolicy v0.1.57/go.mod h1:Ky0GOIqAL666JBHyHeIsQ5rjkET902I6XjGEpvCVx9s=
 github.com/projectdiscovery/retryabledns v1.0.118 h1:vrWzUgjRyD5fg2QiPF0boDuSL/QYuoxPftgpYQv2MiQ=
 github.com/projectdiscovery/retryabledns v1.0.118/go.mod h1:qHuxflnN8BWWqQ+N+TIe9OTqmaMpE/G2+36chAcFQhg=
 github.com/projectdiscovery/retryablehttp-go v1.3.31 h1:0hSEZ5+jj6Oo1IL8qrytD36TK/qCxfe543jEaRqSTjs=
@@ -209,8 +209,8 @@ github.com/tklauser/go-sysconf v0.3.16 h1:frioLaCQSsF5Cy1jgRBrzr6t502KIIwQ0MArYI
 github.com/tklauser/go-sysconf v0.3.16/go.mod h1:/qNL9xxDhc7tx3HSRsLWNnuzbVfh3e7gh/BmM179nYI=
 github.com/tklauser/numcpus v0.11.0 h1:nSTwhKH5e1dMNsCdVBukSZrURJRoHbSEQjdEbY+9RXw=
 github.com/tklauser/numcpus v0.11.0/go.mod h1:z+LwcLq54uWZTX0u/bGobaV34u6V7KNlTZejzM6/3MQ=
-github.com/weppos/publicsuffix-go v0.50.4-0.20260821095816-b0fdb5c2d345 h1:hJZP+OOgu8pORqJKySfSrzEzMmyJUfG9/Khm/Jom0E8=
-github.com/weppos/publicsuffix-go v0.50.4-0.20260821095816-b0fdb5c2d345/go.mod h1:/rOa781xBykZhHK/I3QeHo92qdDKVmKZKF7s8qAEM/4=
+github.com/weppos/publicsuffix-go v0.50.4-0.20260918082853-3c3d7dc4a0cb h1:QIW0GHVTSubm3VxkKpn1FnFAgins6N8FiGTvUQwpXzw=
+github.com/weppos/publicsuffix-go v0.50.4-0.20260918082853-3c3d7dc4a0cb/go.mod h1:/rOa781xBykZhHK/I3QeHo92qdDKVmKZKF7s8qAEM/4=
 github.com/xyproto/randomstring v1.0.5 h1:YtlWPoRdgMu3NZtP45drfy1GKoojuR7hmRcnhZqKjWU=
 github.com/xyproto/randomstring v1.0.5/go.mod h1:rgmS5DeNXLivK7YprL0pY+lTuhNQW3iGxZ18UQApw/E=
 github.com/yl2chen/cidranger v1.0.2 h1:lbOWZVCG1tCRX4u24kuM1Tb4nHqWkDxwLdoS+SevawU=
@@ -224,8 +224,8 @@ github.com/yusufpapurcu/wmi v1.2.4 h1:zFUKzehAFReQwLys1b/iSMl+JQGSCSjtVqQn9bBrPo
 github.com/yusufpapurcu/wmi v1.2.4/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
 github.com/zcalusic/sysinfo v1.0.2 h1:nwTTo2a+WQ0NXwo0BGRojOJvJ/5XKvQih+2RrtWqfxc=
 github.com/zcalusic/sysinfo v1.0.2/go.mod h1:kluzTYflRWo6/tXVMJPdEjShsbPpsFRyy+p1mBQPC30=
-github.com/zmap/zcrypto v0.0.0-20260906180147-3ed30b1e9340 h1:DzCAn4KcjdDOAyvwhB6z7BL7oRKvALWBwvQ0BApOdI0=
-github.com/zmap/zcrypto v0.0.0-20260906180147-3ed30b1e9340/go.mod h1:q7N4dwTU1frjgmnTIFxCyAC8mYz32ONxjkbch7whBzo=
+github.com/zmap/zcrypto v0.0.0-20261015050653-aa1de3126e87 h1:B9sBGvtHjiGOOemAh0cCGTzub76DXlxmOh3Qtx3TkRs=
+github.com/zmap/zcrypto v0.0.0-20261015050653-aa1de3126e87/go.mod h1:9O2aSz1l9fUHTFxJMYCoFsZBy6yGlz3nrOp4dHue5qw=
 go.etcd.io/bbolt v1.3.7 h1:j+zJOnnEjF/kyHlDDgGnVL/AIqIJPq8UoB2GSNfkUfQ=
 go.etcd.io/bbolt v1.3.7/go.mod h1:N9Mkw9X8x5fupy0IKsmuqVtoGDyxsaDlbk4Rd05IAQw=
 go.uber.org/multierr v1.11.0 h1:blXXJkSxSSfBVBlC76pxqeO+LN3aDfLQo+309xJstO0=
