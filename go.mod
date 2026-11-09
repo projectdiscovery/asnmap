@@ -5,7 +5,7 @@ go 1.26.10
 require (
 	github.com/projectdiscovery/goflags v0.2.1
 	github.com/projectdiscovery/gologger v1.1.75
-	github.com/projectdiscovery/hmap v0.0.102
+	github.com/projectdiscovery/hmap v0.0.104
 	github.com/projectdiscovery/mapcidr v1.1.97
 	github.com/projectdiscovery/retryabledns v1.0.118
 	github.com/stretchr/testify v1.12.1
@@ -71,7 +71,7 @@ require (
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.15.3-0.20240618155329-98d742f6907a // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
-	github.com/projectdiscovery/fastdialer v0.6.1 // indirect
+	github.com/projectdiscovery/fastdialer v0.6.2 // indirect
 	github.com/projectdiscovery/machineid v0.0.0-20250715113114-c77eb3567582 // indirect
 	github.com/projectdiscovery/networkpolicy v0.1.57 // indirect
 	github.com/projectdiscovery/retryablehttp-go v1.3.31 // indirect
